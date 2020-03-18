@@ -51,6 +51,9 @@ This document is written in rmarkdown and consists of blocks of text that are fo
 Spatial population structure impacts selection for resistance in a complex fashion. Complex structure allows resistance strategies to be selected for that would not survive in unstrucutred populations. [@Boete2019].
 
 Host-parasite metapopulation and migration structure strongly influences coevolution [@Kaltz1998]
+
+
+
 --------------------
 
 \newpage
