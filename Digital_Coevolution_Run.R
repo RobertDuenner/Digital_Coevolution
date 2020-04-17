@@ -8,7 +8,7 @@
 ###########################################################
 ## This script simply coordinates the running of the 
 ## Digital_Coevolution simulation, and takes those
-## Steps out of the frontend script that most users
+## steps out of the frontend script that most users
 ## will interact with. 
 
 # Load data.table library
