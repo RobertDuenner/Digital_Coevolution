@@ -1,16 +1,19 @@
 ---
 title: "Digital_Coevolution"
-subtitle: "An agent based simulation framework for host-parasite coevolution"
+subtitle: "An agent based simulation for host-parasite coevolution"
 author: "Robert P. Duenner"
-date: '2020-03-13'
+date: '2020-04-27'
 output:
-  pdf_document: 
+  github_document: 
+    toc: true
+  pdf_document:
+    highlight: zenburn
   word_document: 
   html_document: 
     toc: true
     toc_depth: 3
-    number_sections: true
-    toc_float: 
+    number_sections: false
+    toc_float:  
       collapsed: true
     code_folding: hide
 bibliography: My Library.bib
@@ -26,6 +29,7 @@ opts_chunk$set(tidy.opts=list(width.cutoff=60)) #,tidy=TRUE)
 # This can be activated to exclude all R chunks from the final output. I am thinking of something like having the R code in the readme, and not having it in the thesis. Makes things flexible.
 #knitr::opts_chunk$set(include = FALSE)
 ```
+
 \newpage
 \tableofcontents
 \newpage
@@ -33,36 +37,41 @@ opts_chunk$set(tidy.opts=list(width.cutoff=60)) #,tidy=TRUE)
 # Introduction
 Many factors influence the growth of a host population and the infection dynamics with parasites. Each host is an individual that gets born, has to compete for resources and possibly mates, grows, and ideally also reproduces. How well it does all of those is defined as the life history of the host and its trade-offs. The host might also be unlucky and encounter a parasite. If an infection happens is dependent on the genotypes of host and parasite, how specific the infectivity of the parasite is, how many parasites are encountered and how large the host and its infective dose is, how well the constitution of the host and especially the hosts immune system is and so much more. All those factors are a given in wild populations, but many might be unknown and for sure can not be manipulated. The same goes for laboratory populations in micro- or mesocosms.  
 
-But the interaction of host and parasite goes way beyond what happens between individual hosts and parasites. All organisms life in populations. Some might be larger, some smaller, some denser, others sparse, some isolated, others very well connected and part of a metapopulation. All those influence the infection dynamics of host and parasite. Larger host populations are less affected by drift and can have a larger genetic diversity, sustaining parasites longer before they burn out. In small populations parasites can degrade genetic polymorphism (see chapter 2). Connected metapopulations can have a great impact on the coevolution [@Ladle1993; @Lion2015] and the genetic structure of both the host and the parasite [@Judson1995; @Judson1997], depending on the connection regime. The amount of migrants and the migration distance can have influence on virulence evolution [@Boots1999; @Boots2007], influences local adaptation of the parasite on the host [@Gandon1996; @Gandon2002; @Gandon2002a] and enable sustained red queen cycles or can even shut down negative frequency dependent selection within subpopulations (see chapter 3).  
+The interaction of host and parasite goes way beyond what happens between individual hosts and parasites. All organisms live in populations. Some might be larger, some smaller, some denser, others sparse, some isolated, others very well connected and part of a metapopulation. All those influence the infection dynamics of host and parasite. Larger host populations are less affected by drift and can have a larger genetic diversity, sustaining parasites longer before they burn out. In small populations parasites can degrade genetic polymorphism (see chapter 2). Metapopulation structure on the other hand has a tremendous impact on the coevolution [@Ladle1993; @Lion2015] and the genetic structure of both the host and the parasite [@Judson1995; @Judson1997]. The amount of migrants and the migration distance can influence virulence evolution [@Boots1999; @Boots2007], enable local adaptation of the parasite on the host [@Gandon1996; @Gandon2002; @Gandon2002a] or can even shut down negative frequency dependent selection within subpopulations (see chapter 3).  
 
 It is hard to account for all those factors in the wild, lest find several comparable examples with different parameters that would allow for fine tuned hypothesis testing. It is still hard to get conditions right for laboratory populations to sustain infection in just the right way, a process that can absorb more time than the actual experiment itself. And establishing sizeable metapopulations are a logistical challenge.  
 Simulations can help with that. 
 
-Invaluable insight into most areas of host parasite coevolution has been gained by simulation studies or theoretical models (see all citations above), including the first hypotheses of parasites as causative agents of negative frequency dependent selection and maintenance of genetic polymorphism [@Haldane1949; @Haldane1963; @Clarke1976; @Clarke1979] as well as sexual reproduction [@Jaenike1978; @Hamilton1980; @Hamilton1990]. The power and capabilities of computer simulations icreases steadily with time, as hardware gets more powerfull and software advances. This opens the opportunity to create simulations that try to capture more and more biological realism, trying to make the gap in realism between simulations and laboratory micro- and mesocosms smaller. All models are wrong, but some are usefull. A simulation can never be as realistic as the real world, as much as a map can never be the real landscape. But we can try and make the simulation as realistic as possible by trying to include different aspects of a host and a parasites life cycle that we deem relevant, trying to enhance the precision and usability of predictions generated by this simulation, much as we can draw more information from a more detailed map.
+Invaluable insight into most areas of host parasite coevolution has been gained by simulation studies or theoretical models (see all citations above), including the first hypotheses of parasites as causative agents of negative frequency dependent selection and maintenance of genetic polymorphism [@Haldane1949; @Haldane1963; @Clarke1976; @Clarke1979] as well as sexual reproduction [@Jaenike1978; @Hamilton1980; @Hamilton1990]. The power and capabilities of computer simulations increases steadily with time, as hardware becomes more powerful and software advances. This opens the opportunity to create simulations that try to capture more and more biological realism, trying to make the gap in realism between simulations and laboratory micro- and mesocosms smaller. All models are wrong, but some are useful. A simulation can never be as realistic as the real world, as much as a map can never be the real landscape. But we can try and make the simulation as realistic as possible by trying to include different aspects of a hosts and a parasites life cycle that we deem relevant, trying to enhance the precision and usability of predictions generated by this simulation, much as we can draw more information from a more detailed map.
 
-The goal could be to advance simulations as much as to create digital organisms that recreate key aspects of real world organisms in silico, in order to be able to use those organisms in in-silico experiments that have clear laboratory counterparts. This would make results of simulations direcly comparable, and allows for the generation of testable hypotheses. It is also especially handy to explore a variety of different questions in a fast, convenient and cheap manner before trying to establish elaborate and costly experiments.
+The goal could be to advance simulations as much as to create digital organisms that recreate key aspects of real world organisms in silico, in order to be able to use those organisms in in-silico experiments that have clear laboratory counterparts. This would make results of simulations directly comparable, and allows for the generation of testable hypotheses. It is also especially handy to explore a variety of different questions in a fast, convenient and cheap manner before trying to establish elaborate and costly experiments.
 
-One area that I deem especially noteworthy in this respect are agent based or individual based models. Those models simulated the behaviour of each individual explicitly, allowing for a great amount of detail. Instead of detailing required properties at the population level, those simulation describe rules for individual behaviour and development. All further higher level dynamcics, for example interaction with other individuals or population or metapopulation dynamics are then emergent properties of the behaviour of groups of individually simulated agents. 
+One area that I deem especially noteworthy in this respect are agent based or individual based models. Those models simulate the behaviour of each individual explicitly, allowing for a great amount of detail. Instead of detailing required properties at the population level, those simulations describe rules for individual behaviour and development. All further higher level dynamcics, for example interaction with other individuals or population or metapopulation behaviour, are then emergent properties of the behaviour of groups of individually simulated agents. 
 
-The Digital_Coevolution simulation script is a digital organism in the sense that it tries to simulate the dynamic behaviour of single organisms in a computer simulation. Population level behaviour emerges from interactions between several of these simulated organisms. This means Digital_Coevolution falls into the category of agent based simulations, a level of simulation exceptionally well suited to study questions in evolutionary biology. It was created initially as a tool to study how metapopulation structure influences coevolutionary dynamics between hosts and parasites, but can be extended to the study of many different question in host parasite coevolution. 
+The Digital_Coevolution simulation script is a digital organism in the sense that it tries to simulate the dynamic behaviour of single organisms in a computer simulation. Population level behaviour emerges from interactions between several of these simulated organisms. This means Digital_Coevolution falls into the category of agent based simulations, a level of simulation exceptionally well suited to study questions in evolutionary biology. It was created initially as a tool to study how metapopulation structure influences coevolutionary dynamics between hosts and parasites, but can be extended to the study of many different questions in host parasite coevolution. 
 
 This document serves as the documentation for the Digital_Coevolution simulation framework. It describes the inner workings and the reasoning behind the Digital_Coevolution simulation and should enable the reader to thoroughly understand and use the simulation. The first part describes the "biological logic" behind the code. It describes the functions that govern the behaviour of the agents in this agent based simulation. The second part then describes the implementation of the Digital_Coevolution, moving from biologial logic towards R logic. The third part finally describes how to use the Digital_Coevolution simulation yourself.  
 This document is written in rmarkdown [@Xie2018; @Allaire2020] in R [@RCoreTeam2020] using RStudio [@RStudioTeam2019] as IDE. It consists of blocks of text that are followed by snippets of commented code when appropriate. The text and the comments do show some substantial overlap, trying to reinforce a thourough understanding of what is happening in the simulation. The code snippets are not complete though, and serve mostly as explanations. If you would like to have a look at the complete source code or even contribute, you are very welcome to do so, and I invite you to visit the Digital_Coevolution Github repository of the simulation (in case that isn't where you already are) (cite github repository) or the github repositories of chapter 2 and 3 to see the simulation in action (cite github repositories).  
 
 -------------------------------
 
-<br>
 \newpage
 
 # Part One: Biological Logic
 
 ## Overview
-The agents that make up the Digital_Coevolution simulation have quite complex life histories. They get born as small individuals with a few resident resources. They compete with conspecifics for resources, and can use those resources to grow. Excess resources can be used to build up a fat storage for harder times. The older an individual grows, the less resources it invests in growth and the more resources it invests in reproduction. Reproduction is a iteroparous clonal capital breeder, so each individual has to safe up resources until it can start reproducing, but it can reproduce several times during its lifetime resources permitting. The age dependent shift of resource investment from growth to reproduction ensures that early in life, the resources invested into reproduction are not sufficient to produce offspring, creating a distinct juvenile phase that is dominated by growth. Later in life, when more resources are invested into reproduction, a individual does not grow substantially, creating an adult life stage that is dominated by reproduction. Throughout all life stages an host individual can encounter parasites. Those are ingested haphazardously with food resources, and might establish an infection in an host individual, depending on the number of spores ingested and the respective genotypes of host individual and parasites spores. If an infection does establish, it starts small. Infections do grow over time, until they fill out the space within a host individual that is available to a parasite completely. And infections do steal resources from the host individual. The amount of resources that a parasite steals is dependent on the size of the infection. Larger infections steal more resources. Infections produce more parasites in the same mode as the host, as an iteroparous clonal capital breeder. As soon as an infection has stolen enough resources from a host it will produce a clutch of offspring that are shed without killing the host. Large infections can hence have a huge influence on the parasite population. A young host indiviual that gets infected early with a parasite might thus find it's growth hampered or it might find itself being sterilized, as it can not funnel enough resources to reproduction. An older, larger individual that gets infected late might already have had some reproductive output and already have grown larger, but it will also be able to sustain a much larger infection that then produces many many parasite spores and fuels the parasite epidemic. And finally will a parasite infection kill its host as soon as the host does not have enough resources left anymore, for example when the fat storage is used up and there are not enough new resources coming in. The infection does spread horizontally, as parasites are passively ingested by host individuals while foraging. This, together with the non - lethal shedding of new parasites by infections, creates an faeco - oral horizontal transmission.  
-The epidemics spread horizontally within populations, with host and parasite encounters being random. One should imagine a well mixed population in terms of hosts, resources and also parasite exposure. But there can be more than one population. The Digital_Coevolution simulation allows to specify any number of discrete populations with any population size. But several populations are useless if there is no migration between the populations. That is why the Digital_Coevolution Simulation also allows to specify any type of migration patters between all populations, for both the host and the parasite sepparately. This can be used to create complex metapopulation structures through which hosts and parasites, and hence also epidemics, can spread.  
+The agents that make up the Digital_Coevolution simulation have quite complex life histories.  
+They are born as small individuals with a few resident resources. They compete with conspecifics for resources, and can use those resources to grow. Excess resources can be used to build up a fat storage for harder times. The older an individual grows, the less resources it invests in growth and the more resources it invests in reproduction. Reproduction is implemented as iteroparous clonal capital breeding, so each individual has to save up resources until it can start reproducing, but it can reproduce several times during its lifetime, resources permitting. The age dependent shift of resource investment from growth to reproduction ensures that early in life, the resources invested into reproduction are not sufficient to produce offspring, creating a distinct juvenile phase that is dominated by growth. Later in life, when more resources are invested into reproduction, an individual does not grow substantially, creating an adult life stage that is dominated by reproduction.  
+Throughout all life stages a host individual can encounter parasites. Those are ingested haphazardously with food resources, and might establish an infection in an host individual, depending on the number of spores ingested and the respective genotypes of the host individual and the parasites spores. If an infection does establish, it starts small. Infections grow over time, until they fill out the space within a host individual that is available to a parasite, completely. Infections steal resources from the host individual. The amount of resources that a parasite steals is dependent on the size of the infection. Larger infections steal more resources.  
+Parasites reproduce in the same mode as the host, as iteroparous clonal capital breeders. But it is not individual parasite agents that reproduce, but the infection within a host individual. The infection within the host acts as the reproducing unit. Infections can only be established by one genotype at a time, htere are no co-infections possible. As soon as an infection has stolen enough resources from a host it will produce a clutch of parasite offsprings that are shed without killing the host.  
+Large infections can hence have a huge influence on the parasite population. A young host indiviual that gets infected early with a parasite might thus find its growth hampered or it might find itself being sterilized, as it can not funnel enough resources to reproduction. An older, larger individual that gets infected late might already have had some reproductive output and already have grown larger, but it will also be able to sustain a much larger infection that then produces many parasite spores and fuels the parasite epidemic.  
+A parasite will kill its host as soon as the host does not have enough resources left anymore, for example when the fat storage is used up and there are not enough new resources coming in. The infection spreads horizontally, as parasites are passively ingested by host individuals while foraging. This, together with the non - lethal shedding of new parasites by infections, creates a faeco - oral horizontal transmission.  
+The epidemics spread horizontally within populations, with host and parasite encounters being random. One should imagine a well mixed population in terms of hosts, resources and also parasite exposure. But there can be more than one population. The Digital_Coevolution simulation allows to specify any number of discrete populations with any population size. Several populations form a metapopulation when there is a distinct migration pattern between the populations. That is why the Digital_Coevolution Simulation also allows to specify any type of migration pattern between the populations. The migration structure can be specified for both the host and the parasite sepparately. This can be used to create complex metapopulation structures through which hosts and parasites, and hence also epidemics, can spread.  
 
+\newpage
 ## Within agent dynamics
 The agents that make up the Digital_Coevolution can best be imagined as small, mobile, aquatic filter feeders, i.e. zooplankters. Of course a simulation can only ever be an approximation of nature, much like a painting is just a picture of reality, but we can try to make the picture look as real as possible. The same thing was tried when programming Digital_Coevolution. Thinking of the agents as zooplankters, for example a Daphnid or a Cyclops, can help with imagining some of the biology that I tried to implement. Throughout the code and the remainder of this document, these agents are called hosts or agents interchangeably.  
-During the simulation, each agent moves through different life history stages, competes with conspecifics for resources and gets potentially exposed to parasites. Those parasites are horizontally transmitted, passive dispersing obligate parasites, which might best be imagined as either a bacterial or fungal pathogens. Maybe think of microsporidians. Parasite agents are called parasites in the simulation.  
+During the simulation, each agent moves through different life history stages, competes with conspecifics for resources and gets potentially exposed to parasites. Those parasites are horizontally transmitted, passive dispersing obligate parasites, which might best be imagined as either a bacterial or fungal pathogens (microsporidians for example). Parasite agents are called parasites in the simulation.  
 The following part gives an overview over the different functions, called dynamics functions, that govern the behaviour of each agent in the simulation. You could read this as the instructions for the life histories of each individual.  
 
 ### Size
@@ -71,89 +80,150 @@ A larger organism will also be able to produce more offspring, as it can acquire
 Size is not implemented as one single dynamics function, but as a trait (of an agent) that is influencing many other dynamics functions. Size itself is influenced in the metabolism function when resources get allocated between different life history processes. Growth is one of these processes that can get resources. Digital_Coevolution agents are born with size = 1 and then invest resources into growth depending on their age. The younger an individual is, the more resources (proportionally) it will invest into growth as opposed to reproduction. Size can also be switched of by setting the host.size parameter to "OFF", which then skips the growth step and keeps all individuals at size = 1 at all times. This is especially usefull when one would like to compare results to other, less complex, simulations.  
 
 ```{r, eval = FALSE}
-    # Depending on the age of the host, resources are funneled more towards reproduction or more towards growth
-  if(host.size == "ON"){
-    Host[Alive.Hosts$Is.Alive, Size := Size + (pmin(Reproduction.Allocation * Size, Resource.Work) * (2 / Age))]
-  }
+# Depending on the age of the host, resources are funneled more towards reproduction or 
+# more towards growth.
+if(host.size == "ON"){
+    Host[Alive.Hosts$Is.Alive, Size := 
+           Size + (pmin(Reproduction.Allocation * Size, Resource.Work) * (2 / Age))]
+}
 ```
 
-In Digital_Coevolution, only host agents have an individual size trait. Parasite agents on the other hand have no size themselves, but as an infection within a single host agent.  
+In Digital_Coevolution, only host agents have an individual size trait. Parasite agents on the other hand have no size themselves. The infection whithin the host agents has a size as well. The infection size is limited by the host agent size, smaller individuals can only maintain smaller infections.  
 
 ```{r, eval = FALSE}
-  # First the infection matures
-  Host[Alive.Hosts$Is.Alive, Infection.Size := Infection.Size * infection.growth.factor]
-  Host[Alive.Hosts$Is.Alive, Infection.Size := pmin(Infection.Size, Size)]
+# First the infection matures.
+Host[Alive.Hosts$Is.Alive, Infection.Size := Infection.Size * infection.growth.factor]
+
+Host[Alive.Hosts$Is.Alive, Infection.Size :=  pmin(Infection.Size, Size)]
 ```
 
 ### Age
 All things age. The agents in the Digital_Coevolution simulation should be no exception. There is an age variable built into both host and parasite agents. It is a simple integer counter whose value increases by one each timestep. There is an old-age cutoff, esentially creating senescence, implemented as a threshold value for both host and parasite.  
 
 ```{r, eval = FALSE}
-    # Takes the Age vector and adds one everywhere, then truncates by a pre-set threshold.
-  Host[Alive.Hosts$Is.Alive, Age := Age + 1L]
-  Host[Alive.Hosts$Is.Alive & Age > age.threshold.host, Alive := 0L]
-  Parasite[Alive.Parasites$Is.Alive, Age := Age + 1L]
-  Parasite[Alive.Parasites$Is.Alive & Age > age.threshold.parasite, Alive := 0L]
+# Takes the Age vector and adds one everywhere, then truncates by a pre-set threshold.
+Host[Alive.Hosts$Is.Alive, Age := Age + 1L]
+
+Host[Alive.Hosts$Is.Alive & Age > age.threshold.host, Alive := 0L]
+
+Parasite[Alive.Parasites$Is.Alive, Age := Age + 1L]
+
+Parasite[Alive.Parasites$Is.Alive & Age > age.threshold.parasite, Alive := 0L]
 ```
 
 ### Host Resources
 Every host agent competes with other host agents for a shared pool of finite resources that renew every timestep. Every host will obtain a discrete amount of resources that are dependent on the size of the host and the size of the host population respective to the available food.  
-The resource allocation within each agent works as follows. The resource pool within agent is split in three "containers". One container is for incoming (ingested) resources, one for resources that are currently available for the metabolism (digested), and one is for storing excess resources (think fat storage). It is best to start explaining here. Any excess resources that still are available metabolically at the beginning of each timestep are moved into the "Resource.Have" container (fat storage). This frees up the "Resource.Work" container (metabolically available resources). It is filled from the "Resource.In" container, where the ingested resources from one time-step earlier are stored, and potentially also from the "Resource.Have" container. This creates a time-lag between ingested and metabolic available resources. Together with the fat storage, this allows agents to feather off variance in resource availability to some extent. The last step is a starving process, which culls all individuals that have less than a set metabolic resource availability threshold.  
+The resource allocation within each agent works as follows. The resource pool within agent is split in three "containers". One container is for incoming (ingested) resources, one for resources that are currently available for the metabolism (digested), and one is for storing excess resources (think fat storage). Any excess resources that are still available metabolically at the beginning of each timestep are moved into the "Resource.Have" container (fat storage). This frees up the "Resource.Work" container (metabolically available resources). It is filled from the "Resource.In" container, where the ingested resources from one time-step earlier are stored, and potentially also from the "Resource.Have" container. This creates a time-lag between ingested and metabolic available resources. Together with the fat storage, this allows agents to feather off variance in resource availability to some extent. The last step is a starving process, which culls all individuals that have less than a set metabolic resource availability threshold.  
 
 ```{r, linewidth = 20, eval = FALSE}
-    # This moves the leftover resources from the resource.work container to the resource.have container. So leftover metabolic resources to the "fat" storage.
-    Host[Alive.Hosts$Is.Alive, Resource.Have := Resource.Have + Resource.Work]
+# This moves the leftover resources from the resource.work container to the resource.have 
+# container. So leftover metabolic resources to the "fat" storage.
+Host[Alive.Hosts$Is.Alive, Resource.Have := Resource.Have + Resource.Work]
     
-    # I will make the resource.have threshhold, so basically the fat content, size dependant. As larger individuals should be able to proportionally store more fat, a qubic increase instead of a linear increase with size migth be applicable.
-    Host[Alive.Hosts$Is.Alive, Resource.Have := pmin(Resource.Have, (Size ^ 2))]
+# I will make the resource.have threshhold, so basically the fat content, size dependant. 
+# As larger individuals should be able to proportionally store more fat, a qubic increase 
+# instead of a linear increase with size migth be applicable.
+Host[Alive.Hosts$Is.Alive, Resource.Have := pmin(Resource.Have, (Size ^ 2))]
     
-    # Then the resource.work (metabolic resource) gets filled by the resource.in container of the last timestep, creating a delay between feeding and availability of energy
-    # This part also lets hosts that get less external resources use some stored resources to fill resource.work
-  Host[Alive.Hosts$Is.Alive, Resource.Work := Resource.In + pmin((round(Size) - Resource.In), Resource.Have)]
-  Host[Alive.Hosts$Is.Alive, Resource.Have := Resource.Have - pmin((round(Size) - Resource.In), Resource.Have)]
+# Then the resource.work (metabolic resource) gets filled by the resource.in container of 
+# the last timestep, creating a delay between feeding and availability of energy.
+# This part also lets hosts that get less external resources use some stored resources to 
+# fill resource.work
+Host[Alive.Hosts$Is.Alive, Resource.Work := 
+       Resource.In + pmin((round(Size) - Resource.In), Resource.Have)]
+Host[Alive.Hosts$Is.Alive, Resource.Have := 
+       Resource.Have - pmin((round(Size) - Resource.In), Resource.Have)]
       
-    # This part removes individuals that have run out of resources (starving). 
-  Host[Alive.Hosts$Is.Alive & Resource.Work < resource.threshold.host, Alive := 0]
+# This part removes individuals that have run out of resources (starving). 
+Host[Alive.Hosts$Is.Alive & Resource.Work < resource.threshold.host, Alive := 0]
 ```
 
 ### Host Metabolism
 The resource dynamics within host agents is based on the resource allocation hypothesis [@Stearns1980]. It assumes that each organism has a certain energy budget which it can alocate to its life history functions like reproduction or growth. This creates trade-offs between different traits or life history strategies.  
-Each host has a metabolic resource availability that is a result of the ingested resources a time step before and resources used from the fat storage (see Host Resources explanation). These resources now need to be allocated to different life history traits. In the case of the Digital_Coevolution, there are three life history traits that are resource dependent. "Immune.State" which is a variable that should integrate the overall maintenance state of the host including its immune system. A low "Immune.State" will result in easier infection. This is the first trait any agent invest resources in, according to its size and a set immune allocation proportion. These resources are lost to the individual and the value of "Immune.State" resets every time-step. Next the host will invest into reproduction ("Reproduction.Have"), again according to a set reproduction allocation proportion and its size. If there are fewer resources available than could be invested, all leftover resources are invested in reproduction. An individual has to grow as well, and depending on the age of the individual, a certain proportion is invested into growth rather than reproduction. This proportion is changing with age, so that younger individuals invest proportionally more into growth instead reproduction. This creates a dynamic that would have a young individual grow fast without reproducing (juvenile stage) before transitioning to reproduction. This size step can also be switched of to create a simulation with agents of constant size instead of agent growth.  
+Each host has a metabolic resource availability that is a result of the ingested resources a time step before and resources used from the fat storage (see Host Resources explanation). These resources now need to be allocated to different life history traits. In the case of the Digital_Coevolution, there are three life history traits that are directly resource dependent.  
+The "Immune.State" is a variable that should integrate the overall maintenance state of the host including its immune system. It is the baseline investment that has to be made by every organism into maintenance of tissue, body temperature, innate immune response etc.. Basically this is the metabolic cost of being alive. It is the first trait that any agent will invest resources in, according to its size and a set immune allocation proportion. The value of "Immune.State" resets every time-step.  
+Next the host will invest into reproduction ("Reproduction.Have"), again according to a set reproduction allocation proportion and its size. If the individual has fewer internal resources available than could be maximally invested into reproduction, reproduction simply drains the remaining resources.  
+An individual has to grow as well, and depending on the age of the individual, a certain proportion is invested into growth of the "Size" rather than reproduction. This proportion is changing with age, so that younger individuals invest proportionally more into growth instead of reproduction. This creates a dynamic that will have a young individual grow fast without reproducing (juvenile stage) before transitioning to adulthood and investment into reproduction. This size step can also be switched off to create a simulation with agents of constant size instead of agent growth. That way a cross comparison to to other agent based simulations is easier.
 
 ```{r, eval = FALSE}
-# this part drains resource.work and assigns to immune.state, refreshes every round, so no immune buildup
-  Host[Alive.Hosts$Is.Alive, Immune.State := pmin(Immune.Allocation * Size, Resource.Work)] # this part drains resource.work and assigns to immune.state, refreshes every round, so no immune buildup
-  Host[Alive.Hosts$Is.Alive, Resource.Work := Resource.Work - pmin(Immune.Allocation * Size, Resource.Work)]
-  
-  Host[Alive.Hosts$Is.Alive, Reproduction.Have := Reproduction.Have + (pmin(Reproduction.Allocation * Size, Resource.Work) * (1 - (2 / Age)))]
-  # this part drains resource.work and moves to reproduction have, cummultative 
-  # Depending on the age of the host, resources are funneled more towards reproduction or more towards growth
-  if(host.size == "ON"){
-    Host[Alive.Hosts$Is.Alive, Size := Size + (pmin(Reproduction.Allocation * Size, Resource.Work) * (2 / Age))]
-  }
-  Host[Alive.Hosts$Is.Alive, Resource.Work := Resource.Work - pmin(Reproduction.Allocation * Size, Resource.Work)]
+# This part drains resource.work and assigns to immune.state, refreshes every round, so no 
+# immune buildup.
+Host[Alive.Hosts$Is.Alive, Immune.State := 
+       pmin(Immune.Allocation * Size, Resource.Work)] 
 
+Host[Alive.Hosts$Is.Alive, Resource.Work := 
+       Resource.Work - pmin(Immune.Allocation * Size, Resource.Work)]
+  
+Host[Alive.Hosts$Is.Alive, Reproduction.Have := 
+       Reproduction.Have + 
+       (pmin(Reproduction.Allocation * Size, Resource.Work) * (1 - (2 / Age)))]
+
+# This part drains resource.work and moves to reproduction have, cummultative.
+# Depending on the age of the host, resources are funneled more towards reproduction or 
+# more towards growth.
+if(host.size == "ON"){
+  Host[Alive.Hosts$Is.Alive, Size := 
+          Size + (pmin(Reproduction.Allocation * Size, Resource.Work) * (2 / Age))]
+}
+
+Host[Alive.Hosts$Is.Alive, Resource.Work := 
+       Resource.Work - pmin(Reproduction.Allocation * Size, Resource.Work)]
 ```
 
 ### Host Reproduction
 Host reproduction is implemented as a capital breeder. Each host individual must accumulate resources until a set threshold in order to produce a batch (a clutch) of offspring. The number of offspring produced is dependent on the available resources and a multiplicative reproduction factor. It is also indirectly dependent on the size of the individual, as larger individuals can obtain more resources.  
-It is implememented by first calculating the identities of all host agents that have accumulated enough resources to reproduce. The identies of reproducing agents are replicated multiple times according to the amount of resources available and the reproductive factor, creating a vector that essentially contains one entry per offspring per agent. This vector is then used to copy the "parents" trait values into empty lines of the host agent data.table.  
+It is implememented by first calculating the identities of all host agents that have accumulated enough resources to reproduce. The identities of reproducing agents are replicated multiple times according to the amount of resources available and the reproductive factor, creating a vector that essentially contains one entry per offspring per agent. This vector is then used to copy the "parents" trait values into empty lines of the host agent data.table. All traits like immune and reproductive allocation are hence heritable.
 
 ```{r, eval = FALSE}
-    # First calculates the number of reproducing individuals, and how many offspring each individual should produce.
-  reproducing.hosts <- Host[, rep(.I[Alive.Hosts$Is.Alive & Reproduction.Have > reproduction.threshold.host], times = round(Host[Alive.Hosts$Is.Alive & Reproduction.Have > reproduction.threshold.host,Reproduction.Have] - reproduction.threshold.host) * reproduction.factor.host)]
+# First calculates the number of reproducing individuals, and how many offspring each 
+# individual should produce.
+reproducing.hosts <- Host[, rep(
+  .I[Alive.Hosts$Is.Alive & Reproduction.Have > reproduction.threshold.host], 
+  times = 
+    round(
+      Host[Alive.Hosts$Is.Alive & 
+             Reproduction.Have > reproduction.threshold.host,Reproduction.Have] - 
+        ((reproduction.threshold.host) * reproduction.factor.host)
+  )
+  ]
     
-# If there are reproducing individuals, proceed
-    if (Host[reproducing.hosts, .N] > 0) {
+# If there are reproducing individuals, proceed, otherwise, skip.
+# Open if statement.
+if (Host[reproducing.hosts, .N] > 0) {
       
-      # In the subset of empty (dead) host rows, fill host rows according to the reproducing hosts.
-    Host[Host[, .I[!Alive.Hosts$Is.Alive][seq(Host[reproducing.hosts, .N])]],
-         `:=` (Alive = 1L, Host.Replicate = Host[reproducing.hosts, Host.Replicate], Host.Population = Host[reproducing.hosts, Host.Population], Host.Infection.Genotype = NA, Age = 1, Resource.Have = 1, Reproduction.Allocation = Host[reproducing.hosts, Reproduction.Allocation], Immune.Allocation = Host[reproducing.hosts, Immune.Allocation], Immune.Genotype = Host[reproducing.hosts, Immune.Genotype], Resource.In = 1, Resource.Work = 0, Reproduction.Have = 0, Immune.State = Host[reproducing.hosts, Immune.State], Infection.State = 0L, Infection.Size = 0, Parasite.Resources = 0, Host.TempID = NA, Size = 1, Host.Generation = (Host[reproducing.hosts, Host.Generation] + 1L), Origin = Host[reproducing.hosts, Host.Population])
+  # In the subset of empty (dead) host rows, fill host rows according to the reproducing 
+  # hosts.
+  Host[Host[, .I[!Alive.Hosts$Is.Alive][seq(Host[reproducing.hosts, .N])]],
+         `:=` 
+       (Alive = 1L, 
+         Host.Replicate = Host[reproducing.hosts, Host.Replicate], 
+         Host.Population = Host[reproducing.hosts, Host.Population], 
+         Host.Infection.Genotype = NA, 
+         Age = 1, 
+         Resource.Have = 1, 
+         Reproduction.Allocation = Host[reproducing.hosts, Reproduction.Allocation], 
+         Immune.Allocation = Host[reproducing.hosts, Immune.Allocation], 
+         Immune.Genotype = Host[reproducing.hosts, Immune.Genotype], 
+         Resource.In = 1, 
+         Resource.Work = 0, 
+         Reproduction.Have = 0, 
+         Immune.State = Host[reproducing.hosts, Immune.State], 
+         Infection.State = 0L, 
+         Infection.Size = 0, 
+         Parasite.Resources = 0, 
+         Host.TempID = NA, 
+         Size = 1, 
+         Host.Generation = (Host[reproducing.hosts, Host.Generation] + 1L), 
+         Origin = Host[reproducing.hosts, Host.Population])
          ]
       
-      # Withdraw the resources used for reproduction
-    Host[Alive.Hosts$Is.Alive & Reproduction.Have > reproduction.threshold.host, Reproduction.Have := Reproduction.Have - (round(Reproduction.Have) - reproduction.threshold.host)]
-    }
+  # Withdraw the resources used for reproduction.
+  Host[Alive.Hosts$Is.Alive & Reproduction.Have > reproduction.threshold.host, 
+       Reproduction.Have := 
+         Reproduction.Have - (round(Reproduction.Have) - reproduction.threshold.host)]
+
+# Close if statement.
+}
 ```
 
 ### Infections
@@ -161,33 +231,69 @@ This section is about within agent infection dynamics. To read about the spread 
 Infections are implemented in a quantitative fashion. Meant by that is that infections have a size, the "Infection.Size" trait, within a host agent. The size of an infection defines how much resources get withdrawn from the hosts resource budget towards the infection by the parasite. Virulence is hence implemented as a resource loss to the host agent. Infections all start at size = 1 and then grow at an exponential pace, mimicking natual infection with microparasites. The resources that get withdrawn by the infection can then be used by the parasite to reproduce, visible in the trait "Parasite.Resources".  
 
 ```{r, eval = FALSE}
-    # First the infection matures
-  Host[Alive.Hosts$Is.Alive, Infection.Size := Infection.Size * infection.growth.factor]
-  Host[Alive.Hosts$Is.Alive, Infection.Size := pmin(Infection.Size, Size)]
+# First the infection matures.
+Host[Alive.Hosts$Is.Alive, Infection.Size := Infection.Size * infection.growth.factor]
+
+Host[Alive.Hosts$Is.Alive, Infection.Size := pmin(Infection.Size, Size)]
     
-    # Then the parasite draws resources, dependant on infection size
-  Host[Alive.Hosts$Is.Alive, Parasite.Resources := Parasite.Resources + pmin(Resource.Work, Infection.Size * virulence)]
-  Host[Alive.Hosts$Is.Alive, Resource.Work := Resource.Work - pmin(Resource.Work, Infection.Size * virulence)]
+# Then the parasite draws resources, dependant on infection size.
+Host[Alive.Hosts$Is.Alive, Parasite.Resources := 
+       Parasite.Resources + pmin(Resource.Work, Infection.Size * virulence)]
+
+Host[Alive.Hosts$Is.Alive, Resource.Work := 
+       Resource.Work - pmin(Resource.Work, Infection.Size * virulence)]
 ```
 
 ### Parasite Reproduction
 The reproduction of the parasite is implemented as a capital breeder as well. This means that the parasite (the infection) must accumulate resources until a set threshold value, upon which a batch of offspring is produced. The threshold value is independent of the infection size, but the amount of offspring produced is proportional to the accumulated resources. As larger infections accumulate more resources faster, larger infections will produce more offspring.  
-The implementation is similar to the host agent reproduction, except that to determine which parasite agent can reproduce, the "Parasite.Resources" trait within the host agents has to be checked. Parasites identities of agents that are reproducing are exported to a vecotr and repeated according to the accumulated resources of the infection and the reproduction factor. This external vector is then used to copy the trait values of the reproducing parasites into empty rows in the parasite data.table.  
+The implementation is similar to the host agent reproduction, except that to determine which parasite agent can reproduce, the "Parasite.Resources" trait within the host agents has to be checked. Parasites identities of agents that are reproducing are exported to a vector and repeated according to the accumulated resources of the infection and the reproduction factor. This external vector is then used to copy the trait values of the reproducing parasites into empty rows in the parasite data.table.  
 
 ```{r, eval = FALSE}
-    # The first step selects the subset of the host population that is infected and where the infections have accumulated enough resources to reproduce. And then multiplies this subset by the reproduction factor
-  reproducing.parasites <- Host[,rep(.I[Alive.Hosts$Is.Alive & Parasite.Resources > reproduction.threshold.parasite], times = round(Host[Alive.Hosts$Is.Alive & Parasite.Resources > reproduction.threshold.parasite, Parasite.Resources] - reproduction.threshold.parasite) * reproduction.factor.parasite)]
-    
-    if (Host[reproducing.parasites, .N] > 0) {
-      #################  This part selects the "dead" rows in the parasite data.table, then calcualtes how many offsping are produced, and updates the values from the corresponding host data.table
-Parasite[Parasite[, .I[!Alive.Parasites$Is.Alive][seq(Host[reproducing.parasites, .N])]],
-             `:=` (Alive = 1L, Parasite.Replicate = Host[reproducing.parasites, Host.Replicate], Parasite.Population = Host[reproducing.parasites, Host.Population], Parasite.Infection.Genotype = Host[reproducing.parasites, Host.Infection.Genotype], Attack.Host.TempID = NA, Attack.Host.Genotype = NA, Success.Parasite.Infection.Genotype = NA, Ingested = 0, Age = 1L)
-             ]
-    Host[Alive.Hosts$Is.Alive & Parasite.Resources > reproduction.threshold.parasite, Parasite.Resources := Parasite.Resources - (round(Parasite.Resources) - reproduction.threshold.parasite)]
+# The first step selects the subset of the host population that is infected and where the 
+# infections have accumulated enough resources to reproduce. And then multiplies this 
+# subset by the reproduction factor.
+reproducing.parasites <- 
+  Host[
+    ,
+    rep(.I[Alive.Hosts$Is.Alive & Parasite.Resources > reproduction.threshold.parasite], 
+        times = round(
+          Host[Alive.Hosts$Is.Alive & 
+                 Parasite.Resources > reproduction.threshold.parasite, 
+               Parasite.Resources] - reproduction.threshold.parasite) * 
+          reproduction.factor.parasite)]
 
-      # Uptdate parasite alive vector
-    set(Alive.Parasites, j = "Is.Alive", value = Parasite[, Alive == 1])
-    } 
+# If there are reproducing individuals, proceed, otherwise, skip.
+# Open if statement.   
+if (Host[reproducing.parasites, .N] > 0) {
+  
+  # This part selects the "dead" rows in the parasite data.table, then calcualtes how  
+  # many offsping are produced, and updates the values from the corresponding 
+  # host data.table
+  Parasite[
+    Parasite[, .I[!Alive.Parasites$Is.Alive][seq(Host[reproducing.parasites, .N])]], 
+             `:=` 
+             (Alive = 1L, 
+               Parasite.Replicate = Host[reproducing.parasites, Host.Replicate], 
+               Parasite.Population = Host[reproducing.parasites, Host.Population], 
+               Parasite.Infection.Genotype = 
+                 Host[reproducing.parasites, Host.Infection.Genotype], 
+               Attack.Host.TempID = NA, 
+               Attack.Host.Genotype = NA, 
+               Success.Parasite.Infection.Genotype = NA, 
+               Ingested = 0, 
+               Age = 1L)
+               ]
+  
+  Host[Alive.Hosts$Is.Alive & Parasite.Resources > reproduction.threshold.parasite, 
+       Parasite.Resources := 
+         Parasite.Resources - 
+         (round(Parasite.Resources) - reproduction.threshold.parasite)]
+
+  # Uptdate parasite alive vector
+  set(Alive.Parasites, j = "Is.Alive", value = Parasite[, Alive == 1])
+
+# Close if statement.    
+} 
 ```
 
 ## Between agent dynamics
@@ -197,103 +303,158 @@ A great benefit of agent based simulations is that between agent interaction dyn
 The host resources are implemented as batch resources per population that renew every timestep. Think of a daily feeding event for a Daphnia culture for example. The hosts then compete for a part of those resources. In order to avoid infinitely small resource consumption, resources are partitioned out in a poisson or quasipoisson distributed way. Each timestep there is a random poisson (or quasipoisson) vector calculated, with one element per host. As the amount of resources available per host is dependent on the population size and the summed-up filtering capacity of the host individuals, the expected mean of the distribution is proportional to the fraction of total filtering capacity per individual. This fraction is calculated by dividing the host individuals' size (equal its filtering capacity) by the sum of sizes over the population, and that fraction is multiplied by the size of the individual again. This means that the population is density dependant with a soft upper border.  
 
 ```{r, eval = FALSE}
-    # This part takes all the available resources, and redistributes them according to host size.
-# It adjusts the resources by relative filtering capacity if the population gets less than maximal food
-  Host[Alive.Hosts$Is.Alive, Resource.In := (rpois(n = .N, lambda = (Size * min(1, (resources.host[Host.Population[1]] / sum(Size)))) * resource.grain) / resource.grain), by = list(Host.Population, Host.Replicate)]
+# This part takes all the available resources, and redistributes them according to 
+# host size. It adjusts the resources by relative filtering capacity if the population 
+# gets less than maximal food.
+Host[Alive.Hosts$Is.Alive, Resource.In := 
+       (rpois(
+         n = .N, 
+         lambda = (Size * min(1, (resources.host[Host.Population[1]] / sum(Size)))) * 
+           resource.grain) / resource.grain), 
+     by = list(Host.Population, Host.Replicate)]
     
-    # This part restricts resource in to Size + 10% in order to avoid unrealistic overfeeding
-  Host[Alive.Hosts$Is.Alive, Resource.In := pmin(Resource.In, (Size * 1.1))]
+# This part restricts resource in to Size + 10% in order to avoid unrealistic overfeeding
+Host[Alive.Hosts$Is.Alive, Resource.In := pmin(Resource.In, (Size * 1.1))]
 ```
 
 ### Infection model
 The infection model in the Digital_Coevolution is implemented as a genotype by genotype lookup table that defines the infection affinity between the two genotypes. This can be specified so that the resulting infection model ranges anywhere between a gene-for-gene model to a matching alleles type infection model. Usually the simulation is run as a perfect matching alleles model, with complete parasite specificity.  
 
 ```{r, eval = FALSE}
-  #Infection dynamic parameters, row is host, column is parasite
-infection.table <- matrix((1 - parasite.specificity), nrow = host.genotypes, ncol = parasite.genotypes)   # row is host, column is parasite
+# Infection dynamic parameters, row is host, column is parasite
+infection.table <- matrix((1 - parasite.specificity), 
+                          nrow = host.genotypes, 
+                          ncol = parasite.genotypes)   # row is host, column is parasite
+
 diag(infection.table) <- 1
 ```
 
 ### Host Exposure to Parasites
 This is arguably both the most complex and the most important part of the simulation. Here the host agents get exposed to new parasites. The exposure within populations is completely random, i.e. there is no host seeking behavior by the parasite and no parasite avoidance by the host. The simulated transmission should be faeco - oral, so the transmission is linked to the feeding rate. As the parasite population can be both bigger or smaller than the host population, the amount of parasites each host is exposed to varies largely.  
-The implementation starts by calculating for each parasite whether or not it has been ingested or not, which is dependent on the size of the host population relative to the available resources (is there over- or underfeeding?). Then each parasite that has been ingested gets assigned the host by which it has been ingested. This is dependent on the size of an individual host relative to the summed-up size of the population. One host individual can ingest several parasites. Not all ingestion events lead to a successful infection. To calculated which parasite succeeded in the infection, there is a random draw from all parasites that infect a host individual, with the probability for each parasite weighted by both the number of spores with that genotype and by the matching of the host genotype and the parasite genotype. Finally, hosts that had already been infected before cannot acquire a new infection (vaccination effect, or simply host being full), but will still eat and remove parasites.  
+The implementation starts by calculating for each parasite whether or not it has been ingested or not, which is dependent on the size of the host population relative to the available resources (is there over- or underfeeding?). Then each parasite that has been ingested gets assigned the host by which it has been ingested. This is dependent on the size of an individual host relative to the summed-up size of the population. One host individual can ingest several parasites. Not all ingestion events lead to a successful infection. To calculate which parasite succeeded in the infection, there is a random draw from all parasites that infect a host individual, with the probability for each parasite weighted by both the number of spores with that genotype and by the matching of the host genotype and the parasite genotype. Finally, hosts that had already been infected before cannot acquire a new infection (vaccination effect, or simply host being full), but will still eat and remove parasites.  
 
 ```{r, eval = FALSE}
-    #This part sets an identifier to be used later on
-  Host[Alive.Hosts$Is.Alive, Host.TempID := 1 : .N]
-  Host[! Alive.Hosts$Is.Alive, Host.TempID := NA]
+# This part sets an identifier to be used later on.
+Host[Alive.Hosts$Is.Alive, Host.TempID := 1 : .N]
+
+Host[! Alive.Hosts$Is.Alive, Host.TempID := NA]
   
   set(Parasite, j = "Ingested", value = 0)
   set(Parasite, j = "Attack.Host.TempID", value = NA)
   set(Parasite, j = "Attack.Host.Genotype", value = NA)
   set(Parasite, j = "Success.Parasite.Infection.Genotype", value = NA)
     
-    # This part removes the identifier from those hosts that already are infected, creating a vaccination effect
-  Host[Alive.Hosts$Is.Alive & Infection.State == 1, Host.TempID := NA]
+# This part removes the identifier from those hosts that already are infected, creating a 
+# vaccination effect. 
+Host[Alive.Hosts$Is.Alive & Infection.State == 1, Host.TempID := NA]
     
-    # This part does assign to each parasite score if it has been ingested by a host, dependant on resource availability, host and parasite population size
-    ##########
-  Parasite[Alive.Parasites$Is.Alive, 
-           Ingested := rbinom(n = .N, size = 1, prob = min(1, (sum(Host[Alive.Hosts$Is.Alive & Host.Population == Parasite.Population[1] & Host.Replicate == Parasite.Replicate[1], Size]) / resources.host[Parasite.Population[1]]))),
-           by = list(Parasite.Population, Parasite.Replicate)]
+# This part does assign to each parasite score if it has been ingested by a host, 
+# dependant on resource availability, host and parasite population size.
+Parasite[Alive.Parasites$Is.Alive, 
+           Ingested := 
+           rbinom(n = .N, 
+                  size = 1, 
+                  prob = min(1, 
+                             (sum(
+                               Host[Alive.Hosts$Is.Alive & 
+                                      Host.Population == Parasite.Population[1] & 
+                                      Host.Replicate == Parasite.Replicate[1], Size]) / 
+                                resources.host[Parasite.Population[1]]))), 
+         by = list(Parasite.Population, Parasite.Replicate)]
     
-  # Updating the Alive.Parasites$Is.Ingested vector for faster lookups
-  Alive.Parasites[Alive.Parasites$Is.Alive, Is.Ingested := Parasite[Alive.Parasites$Is.Alive, Ingested == 1]]
+# Updating the Alive.Parasites$Is.Ingested vector for faster lookups.
+Alive.Parasites[Alive.Parasites$Is.Alive, 
+                Is.Ingested := Parasite[Alive.Parasites$Is.Alive, Ingested == 1]]
     
-    # This part does assign to each parasite spore the host tempID it has been ingested by
-  Parasite[Alive.Parasites$Is.Ingested,
-           Attack.Host.TempID := 
-             base:::sample(x = Host[Alive.Hosts$Is.Alive & Host.Population == Parasite.Population[1] & Host.Replicate == Parasite.Replicate[1], Host.TempID], 
-                           size = .N, 
-                           replace = TRUE, 
-                           prob = c(
-                             Host[Alive.Hosts$Is.Alive & Host.Population == Parasite.Population[1] & Host.Replicate == Parasite.Replicate[1], Size] * 
-                               (.N / resources.host[Parasite.Population[1]]) * 
-                               min(1, resources.host[Parasite.Population[1]] / 
-                                     sum(Host[Alive.Hosts$Is.Alive & Host.Population == Parasite.Population[1] & Host.Replicate == Parasite.Replicate[1], Size]))
+# This part does assign to each parasite spore the host tempID it has been ingested by
+Parasite[Alive.Parasites$Is.Ingested,
+         Attack.Host.TempID := 
+           base:::sample(x = Host[Alive.Hosts$Is.Alive & 
+                                    Host.Population == Parasite.Population[1] & 
+                                    Host.Replicate == Parasite.Replicate[1], 
+                                  Host.TempID], 
+                         size = .N, 
+                         replace = TRUE, 
+                         prob = c(
+                           Host[Alive.Hosts$Is.Alive & 
+                                  Host.Population == Parasite.Population[1] & 
+                                  Host.Replicate == Parasite.Replicate[1], Size] * 
+                             (.N / resources.host[Parasite.Population[1]]) * 
+                             min(1, resources.host[Parasite.Population[1]] / 
+                                   sum(
+                                     Host[Alive.Hosts$Is.Alive & 
+                                            Host.Population == Parasite.Population[1] & 
+                                            Host.Replicate == Parasite.Replicate[1], 
+                                          Size]))
                            )
-             ), 
-           by = list(Parasite.Population, Parasite.Replicate)]
+                         ), 
+         by = list(Parasite.Population, Parasite.Replicate)]
     
-    # This part does assign to each parasite the host genotype it has been ingested by
-  Parasite[Alive.Parasites$Is.Ingested, Attack.Host.Genotype := Host[Alive.Hosts$Is.Alive][Attack.Host.TempID, Immune.Genotype]]
-    
-    # This part calculated which parasite successfully infects, takes into account the relative abundance of ingested parasite spores and their genetic specificity
-  Parasite[Alive.Parasites$Is.Ingested & ! is.na(Attack.Host.TempID), Success.Parasite.Infection.Genotype := sample(c(NA, Parasite.Infection.Genotype), size = 1, prob = c(1,infection.table[Attack.Host.Genotype[1], Parasite.Infection.Genotype]), replace = TRUE), by = list(Attack.Host.TempID, Parasite.Population, Parasite.Replicate)]
+# This part assigns to each parasite the host genotype it has been ingested by.
+Parasite[Alive.Parasites$Is.Ingested, Attack.Host.Genotype := 
+           Host[Alive.Hosts$Is.Alive][Attack.Host.TempID, Immune.Genotype]]
 
+# This part calculated which parasite successfully infects, takes into account the 
+# relative abundance of ingested parasite spores and their genetic specificity.
+Parasite[Alive.Parasites$Is.Ingested & ! is.na(Attack.Host.TempID), 
+         Success.Parasite.Infection.Genotype := 
+           sample(c(NA, Parasite.Infection.Genotype), 
+                  size = 1, 
+                  prob = c(1, 
+                           infection.table[Attack.Host.Genotype[1], 
+                                           Parasite.Infection.Genotype]), 
+                  replace = TRUE), 
+         by = list(Attack.Host.TempID, Parasite.Population, Parasite.Replicate)]
+
+# And the last thing to do would be to assign the infection genotype back to the host.
+infected.hosts <- unique(Parasite[Alive.Parasites$Is.Ingested & 
+                                    ! is.na(Success.Parasite.Infection.Genotype)], 
+                         by = "Attack.Host.TempID")$Attack.Host.TempID
+
+infected.hosts.infection.genotypes <- 
+  unique(Parasite[Alive.Parasites$Is.Ingested & 
+                    ! is.na(Success.Parasite.Infection.Genotype)], 
+         by = "Attack.Host.TempID")$Success.Parasite.Infection.Genotype
+
+Host[Host[, .I[Alive.Hosts$Is.Alive]][infected.hosts], 
+     Host.Infection.Genotype := infected.hosts.infection.genotypes]
     
-    # And the last thing to do would be to assign the infection genotype back to the host
-  infected.hosts <- unique(Parasite[Alive.Parasites$Is.Ingested & ! is.na(Success.Parasite.Infection.Genotype)], by = "Attack.Host.TempID")$Attack.Host.TempID
-  infected.hosts.infection.genotypes <- unique(Parasite[Alive.Parasites$Is.Ingested & ! is.na(Success.Parasite.Infection.Genotype)], by = "Attack.Host.TempID")$Success.Parasite.Infection.Genotype
-  Host[Host[, .I[Alive.Hosts$Is.Alive]][infected.hosts],
-       Host.Infection.Genotype := infected.hosts.infection.genotypes
-       ]
+# And the very last thing is to update the infection status of the host that got assigned 
+# a infection.genotype.
+Host[Alive.Hosts$Is.Alive & ! is.na(Host.Infection.Genotype) & Infection.State == 0, 
+     c("Infection.Size", "Infection.State") := 1]
     
-    # And the very last thing is to update the infection status of the host that got assigned a infection.genotype
-  Host[Alive.Hosts$Is.Alive & ! is.na(Host.Infection.Genotype) & Infection.State == 0, c("Infection.Size", "Infection.State") := 1]
-    
-    #And kill the parasites that have been ingested
-  Parasite[Alive.Parasites$Is.Ingested, Alive := 0]
+# And kill the parasites that have been ingested
+Parasite[Alive.Parasites$Is.Ingested, Alive := 0]
 ```
 
 ### Host Resources Simulation Wide
-Resources do control the size of a simulated population. So the resources can be used together with the migration pattern to create any type of metapopulation. The resources simply control the size of the subpopulations, while the migration pattern controls, well, the migration between the subpopulations. The resources that are available per population are set together with all other variables at the beginning of the simulation. They are implemented as a small integer vector, where the number of vector elements is the number of populations that are going to be simulated, and the value of the vector elements is the size of the simulated population. This way it is possible to simulate a metapopulation that consists of subpopulations of vastly different population sizes.  
+Resources control the size of a simulated population. So the resources can be used together with the migration pattern to create any type of metapopulation. The resources simply control the size of the subpopulations, while the migration pattern controls, well, the migration between the subpopulations. The resources that are available per population are set together with all other variables at the beginning of the simulation. They are implemented as a small integer vector, where the number of vector elements is the number of populations that are going to be simulated, and the value of the vector elements is the size of the simulated population. This way it is possible to simulate a metapopulation that consists of subpopulations of vastly different population sizes.  
 
 ```{r, eval = FALSE}
-  # Here at the same time the number of populations and their size are set. For each population define explicitly the amount of resources it receives daily. Currently, population size settles at about half the resources given. 
-  resources.host <- c(500, 50, 50)
-  ######################################################################
-  number.populations.host <- length(resources.host)
-  populations.host <- c(1 : number.populations.host)
-  starting.population.sizes.host <- ceiling(resources.host / 2)
-  #############
-  number.populations.parasite< - number.populations.host
-  populations.parasite <- c(1 : number.populations.parasite)
-  starting.population.sizes.parasite <- ceiling(resources.host * 10)
+# Here at the same time the number of populations and their size are set. For each 
+# population define explicitly the amount of resources it receives daily. Currently, 
+# population size settles at about half the resources given. 
+resources.host <- c(500, 50, 50)
+
+###
+number.populations.host <- length(resources.host)
+
+populations.host <- c(1 : number.populations.host)
+
+starting.population.sizes.host <- ceiling(resources.host / 2)
+
+###
+number.populations.parasite< - number.populations.host
+
+populations.parasite <- c(1 : number.populations.parasite)
+
+starting.population.sizes.parasite <- ceiling(resources.host * 10)
 ```
 
+\newpage
 ## Between Population Dynamics
-A very central feature of the Digtial_Daphnia simulation is that it can simulate several interconnected populations of both host and parasite agents. When we imaginge a host agent population as a glas jar full of zooplankton, then we can imagine the metapopulation as the climate chamber in which the glass jars are standing. Depending on the migration schedule, host or parasite individuals can be moved between different glass jars in the climate chamber. So host and parasite agents can migrate between differnt host and parasite agent populations. Much as would be done in an experiment in a climate chamber, this migration happens once a timestep (once a day). And much as in an experiment, migration can happen at different rates between different populations. Last but not least, those populations can also be of different sizes, with differnt amounts of food available to them.  
+A very central feature of the Digtial_Coevolution simulation is that it can simulate several interconnected populations of both host and parasite agents. When we imaginge a host agent population as a glas jar full of zooplankton, then we can imagine the metapopulation as the climate chamber in which the glass jars are standing. Depending on the migration schedule, host or parasite individuals can be moved between different glass jars in the climate chamber. So host and parasite agents can migrate between differnt host and parasite agent populations. Much as would be done in an experiment in a climate chamber, this migration happens once a timestep (once a day). And much as in an experiment, migration can happen at different rates between different populations. Last but not least, those populations can also be of different sizes, with differnt amounts of food available to them.  
 
 ### Hierarchical Metapopulation
 Population interconnectivity is implemented as a population by population fully crossed lookup table that defines how many individuals move from which population to which, both for the host and the parasite. This allows for the implementation of any arbitrary metapopulation structure, from only lightly diverged large metapopulations to a network of highly diverged populations. Combined with the explicit resource availability per population, this can also create asymmetrical metapopulations, as for example a mainland-island model.  
@@ -301,25 +462,35 @@ Most importantly, by enabling the user to specify the metapopulation structure f
 
 ```{r, eval = FALSE}
 # Migration matrix for the host
-  migration.matrix.host <- matrix((host.migration / number.populations.host), nrow = number.populations.host, ncol = number.populations.host)
-  diag(migration.matrix.host) <- diag(migration.matrix.host) + (1 - host.migration)
+migration.matrix.host <- matrix((host.migration / number.populations.host), 
+                                nrow = number.populations.host, 
+                                ncol = number.populations.host)
+
+diag(migration.matrix.host) <- 
+  diag(migration.matrix.host) + (1 - host.migration)
   
 # Migration matrix for the parasite
-  migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), nrow = number.populations.parasite, ncol = number.populations.parasite)
-  diag(migration.matrix.parasite) <- diag(migration.matrix.parasite) + (1 - parasite.migration)
+migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), 
+                                    nrow = number.populations.parasite, 
+                                    ncol = number.populations.parasite)
+
+diag(migration.matrix.parasite) <- 
+  diag(migration.matrix.parasite) + (1 - parasite.migration)
 ```
 
 ### Parasite Migration
 This allows the parasite to migrate between different populations. It does so simply by picking a random subset of the free parasite population, and randomly assigning it to a new population. Migration is thus completely random and independent of any parasite properties.  
 
 ```{r, eval = FALSE}
-  parasite.migration.function <- function(){
-    Parasite[Alive.Parasites$Is.Alive, 
-             Parasite.Population := base:::sample(1 : number.populations.parasite, 
-                                                  size = .N, 
-                                                  prob = migration.matrix.parasite[Parasite.Population[1], ], 
-                                                  replace = TRUE), 
-             by = list(Parasite.Population, Parasite.Replicate)]
+parasite.migration.function <- function(){
+  Parasite[Alive.Parasites$Is.Alive,
+           Parasite.Population := 
+             base:::sample(1 : number.populations.parasite, 
+                                                size = .N, 
+                                                prob = 
+                             migration.matrix.parasite[Parasite.Population[1], ], 
+                           replace = TRUE), 
+           by = list(Parasite.Population, Parasite.Replicate)]
   }
 ```
 
@@ -327,19 +498,19 @@ This allows the parasite to migrate between different populations. It does so si
 The host migration works analog to the parasite migration. A set fraction of the host population gets chosen at random, and then randomly assigned to a new population.  
 
 ```{r, eval = FALSE}
-  host.migration.function <- function(){
-    Host[Alive.Hosts$Is.Alive, 
-         Host.Population := base:::sample(1 : number.populations.host, 
-                                          size = .N, 
-                                          prob = migration.matrix.host[Host.Population[1], ], 
-                                          replace = TRUE),
-         by = list(Host.Population, Host.Replicate)]
+host.migration.function <- function(){
+  Host[Alive.Hosts$Is.Alive,
+       Host.Population := 
+         base:::sample(1 : number.populations.host, 
+                       size = .N, 
+                       prob = migration.matrix.host[Host.Population[1], ], 
+                       replace = TRUE), 
+       by = list(Host.Population, Host.Replicate)]
   } 
 ```
 
 ---------------------------------------------------------------------------------------------------
 
-<br>
 \newpage
 
 # Part Two: Implementation of the Digital_Coevolution simulation
@@ -416,70 +587,94 @@ random.drift <- 0
 # Read in the date, so that stuff can run over night without causing trouble
 run.date <- Sys.Date()
 
-  ######################################################################
-  ######################################################################
+######################################################################
+######################################################################
 ###### Parameter space
 # Internal dynamic parameters
 # Host internal dynamic parameters
 host.size <- "OFF" 
 age.threshold.host <- 30
 resource.threshold.host <- 0.2
-reproduction.threshold.host <- 2 # with host.size off and a resource grain of 10, a reproduction threshold of 2 should lead to a first clutch at an age of 10. # Ancient param: 10
-reproduction.factor.host <- 4 #6
+reproduction.threshold.host <- 2 
+reproduction.factor.host <- 4 
 reproduction.allocation <- 0.35
 immune.allocation <- 0.35
 
-#Parasite internal dynamic parameters
+# Parasite internal dynamic parameters
 parasite.genotypes <- host.genotypes
-age.threshold.parasite <- 60 #60
-reproduction.threshold.parasite <- 2 #4
-reproduction.factor.parasite <- 23 #23
+age.threshold.parasite <- 60 
+reproduction.threshold.parasite <- 2 
+reproduction.factor.parasite <- 23 
 
-#Infection dynamic parameters
-infection.table <- matrix((1 - parasite.specificity), nrow = host.genotypes, ncol = parasite.genotypes)   # row is host, column is parasite
+# Infection dynamic parameters, row is host, column is parasite
+infection.table <- matrix((1 - parasite.specificity), 
+                          nrow = host.genotypes, 
+                          ncol = parasite.genotypes) 
 diag(infection.table) <- 1
-infection.growth.factor <- 1.15 # This factor gives the per time unit growth of a infection, in percent
 
-# Genetic parameters
-#neutral.mutation.rate <- 0.001
+# This factor gives the per time unit growth of a infection, in percent
+infection.growth.factor <- 1.15 
 
 # Resource parameters
-resource.grain <- 10 # This is the modifier that can increase or decrease the variance in resource distribution. The higher the number the less variance. With value 1 its a normal poisson distribution
+# This is the modifier that can increase or decrease the variance in resource 
+# distribution. The higher the number the less variance. With value 1 its a normal 
+# poisson distribution.
+resource.grain <- 10 
 
 ######################################################################
 ######################################################################
-# Here at the same time the number of populations and their size are set. For each population define explicitly the amount of resources it receives daily. Currently, population size settles at about half the resources given. 
+# Here at the same time the number of populations and their size are set. For each 
+# population define explicitly the amount of resources it receives daily. Currently, 
+# population size settles at about half the resources given.
 resources.host <- host.populations
-######################################################################
+
+###
 number.populations.host <- length(resources.host)
 populations.host <- c(1 : number.populations.host)
 starting.population.sizes.host <- ceiling(resources.host / 2)
-#############
+
+###
 number.populations.parasite <- number.populations.host
 populations.parasite <- c(1 : number.populations.parasite)
 starting.population.sizes.parasite <- ceiling(resources.host * 10)
 
-######################################################################
+###
 # External Population dynamic parameters:
-migration.matrix.host <- matrix((host.migration / number.populations.host), nrow = number.populations.host, ncol = number.populations.host)
-diag(migration.matrix.host) <- diag(migration.matrix.host) + (1 - host.migration)
+migration.matrix.host <- matrix((host.migration / number.populations.host), 
+                                nrow = number.populations.host, 
+                                ncol = number.populations.host)
 
-migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), nrow = number.populations.parasite, ncol = number.populations.parasite)
-diag(migration.matrix.parasite) <- diag(migration.matrix.parasite) + (1 - parasite.migration)
+diag(migration.matrix.host) <- 
+  diag(migration.matrix.host) + (1 - host.migration)
+
+migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), 
+                                    nrow = number.populations.parasite, 
+                                    ncol = number.populations.parasite)
+
+diag(migration.matrix.parasite) <- 
+  diag(migration.matrix.parasite) + (1 - parasite.migration)
  
-  ###################################################################### ###################################################################### ######################################################################
-  ######################################################################
-  # In this step I preallocate all the data.table space that I could be using in an attempt to speed up the simulation.
-individual.creator.function <- function(){  
+######################################################################
+######################################################################
+# In this step I preallocate all the data.table space that I could be using in an 
+# attempt to speed up the simulation.
+individual.creator.function <- function(){
   
-  preallocation.margin <- 10 # How many times larger is the maximum calculatable population size #15
+  preallocation.margin <- 10 # How many times larger the data.table size.
+  
   parasite.margin <- 1
-  preallocation.length <- sum(starting.population.sizes.host * replicates * preallocation.margin)
-  preallocation.parasite <- sum(starting.population.sizes.parasite * replicates * preallocation.margin * parasite.margin)
   
-  if(exists("Host")) {
-    rm(Host, pos = ".GlobalEnv")
-  }
+  preallocation.length <- 
+    sum(starting.population.sizes.host * replicates * preallocation.margin)
+  
+  preallocation.parasite <- 
+    sum(starting.population.sizes.parasite * replicates * 
+          preallocation.margin * parasite.margin)
+
+  
+  if(exists("Host")) {rm(Host, pos = ".GlobalEnv")}
+
+    
   Host <<- data.table(  
     Alive = integer(preallocation.length),
     Host.Replicate = integer(preallocation.length), 
@@ -490,7 +685,11 @@ individual.creator.function <- function(){
     Resource.Have = numeric(preallocation.length),
     Reproduction.Allocation = numeric(preallocation.length),
     Immune.Allocation = numeric(preallocation.length),
-    Immune.Genotype = factor(sample(c(1 : host.genotypes),size = preallocation.length,prob = rep(1 / host.genotypes,host.genotypes), replace = T), levels = c(1 : host.genotypes)),
+    Immune.Genotype = factor(sample(c(1 : host.genotypes), 
+                                    size = preallocation.length, 
+                                    prob = rep(1 / host.genotypes,host.genotypes), 
+                                    replace = T), 
+                             levels = c(1 : host.genotypes)),
     Resource.In = numeric(preallocation.length),
     Resource.Work = numeric(preallocation.length),
     Reproduction.Have = numeric(preallocation.length),
@@ -503,51 +702,77 @@ individual.creator.function <- function(){
     Host.Generation = integer(preallocation.length),
     Origin = integer(preallocation.length)
   )
+
+  # Here I initialize the starter populations.
+  # Replicate, this way I hope to paralellize the replicate calculations.
+  Host[, Host.Replicate := 
+         c(rep(1 : replicates, 
+               each = sum(starting.population.sizes.host)), 
+           integer(preallocation.length - sum(starting.population.sizes.host) * 
+                     replicates))]
   
-  ### Here I initialize the starter populations
-  # Replicate, this way I hope to paralellize the replicate calculations
-  Host[, Host.Replicate := c(rep(1 : replicates, each = sum(starting.population.sizes.host)), integer(preallocation.length - sum(starting.population.sizes.host) * replicates))]
   # Alive variable, 1 = alive, 0 = not alive
   Host[Host.Replicate != 0, Alive := 1L] 
+  
   # Population
-  Host[Alive == 1, Host.Population := as.integer(rep(1 : number.populations.host, times = starting.population.sizes.host)), by = Host.Replicate]
+  Host[Alive == 1, Host.Population := 
+         as.integer(rep(1 : number.populations.host, 
+                        times = starting.population.sizes.host)), 
+       by = Host.Replicate]
+  
   # Age
   Host[Alive == 1, Age := 1L]
+    
   # Resource.Have
   Host[Alive == 1, Resource.Have := 1]
+    
   # Resource.In, meaning that the starters start with a full belly
   Host[Alive == 1, Resource.In := 1]
+    
   # Reproduction.Allocation
   Host[Alive == 1, Reproduction.Allocation := reproduction.allocation]
+    
   # Immune.Allocation
   Host[Alive == 1, Immune.Allocation := immune.allocation]  
+    
   # Immune.Genotype, has been set when initializing, needs to be cleaned
   Host[Alive == !1, Immune.Genotype := NA] 
+    
   # Infection.Genote
   Host[, Host.Infection.Genotype := NA]
+    
   # Size
   Host[Alive == 1, Size := 1]
+    
   # Host.Generation
   Host[Alive == 1, Host.Generation := 1L]
+    
   # Origin
-  Host[Alive == 1, Origin := Host.Population]
-  
-  # Here I start a vector that just contains if a host is alive or not, to circumvent all the lookups
-  if(exists("Alive.Host")) {
-    rm(Alive.Host, pos = ".GlobalEnv")
-  }
+    Host[Alive == 1, Origin := Host.Population]
+
+  ### 
+  # Here I start a vector that just contains if a host is alive or not, to circumvent all 
+  # the lookups.
+  if(exists("Alive.Host")) {rm(Alive.Host, pos = ".GlobalEnv")}
+    
   Alive.Hosts <<- data.table(Is.Alive = Host[, Alive == 1])
-  
+    
   # Here I initialize the parasite data.table structure
-  if(exists("Parasite")) {
-    rm(Parasite, pos = ".GlobalEnv")
-  }
+  if(exists("Parasite")) {rm(Parasite, pos = ".GlobalEnv")}
+  
+  
   Parasite <<- data.table(
     Alive = integer(preallocation.parasite),
     Parasite.Replicate = integer(preallocation.parasite), 
     Time = integer(preallocation.parasite),
     Parasite.Population = integer(preallocation.parasite),
-    Parasite.Infection.Genotype = factor(sample(c(1 : parasite.genotypes), size = preallocation.parasite, prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), levels = c(1 : parasite.genotypes)),
+    
+    Parasite.Infection.Genotype = 
+      factor(sample(c(1 : parasite.genotypes),
+                    size = preallocation.parasite, 
+                    prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), 
+             levels = c(1 : parasite.genotypes)),
+    
     Attack.Host.TempID = integer(preallocation.parasite),
     Attack.Host.Genotype = integer(preallocation.parasite),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
@@ -555,53 +780,76 @@ individual.creator.function <- function(){
     Age = integer(preallocation.parasite)
   )
   
-  # Here I initialize the starter populations for the parasite
-  # Replicate
-  Parasite[, Parasite.Replicate := c(rep(1 : replicates, each = sum(starting.population.sizes.parasite)), integer(preallocation.parasite - sum(starting.population.sizes.parasite) * replicates))]
+
+  # Here I initialize the starter populations for the parasite Replicate
+  Parasite[, Parasite.Replicate := 
+             c(rep(1 : replicates, each = sum(starting.population.sizes.parasite)),
+               integer(preallocation.parasite - 
+                         sum(starting.population.sizes.parasite) * replicates))]
+  
   # Alive variable, 1 = alive, 0 = not alive
   Parasite[Parasite.Replicate != 0, Alive := 1L]
+  
   # Population
-  Parasite[Alive == 1, Parasite.Population := as.integer(rep(1 : number.populations.parasite, times = starting.population.sizes.parasite)), by = Parasite.Replicate]
+  Parasite[Alive == 1, 
+           Parasite.Population := 
+             as.integer(rep(1 : number.populations.parasite, 
+                            times = starting.population.sizes.parasite)), 
+           by = Parasite.Replicate]
+  
   # Age 
   Parasite[Alive == 1, Age := 1L]
+  
   # Infection.Genotype, has been set when initializing, needs to be cleaned
   Parasite[Alive != 1, Parasite.Infection.Genotype := NA]
+  
   # Atack.Host.Rownumber
   Parasite[, Attack.Host.TempID := NA]
+  
   # Atack.Host.Genotype
   Parasite[, Attack.Host.Genotype := NA]
   
-  # Here I start a vector that just contains if a Parasite is alive or not, to circumvent all the lookups
-  if(exists("Alive.Parasite")) {
-    rm(Alive.Parasite, pos = ".GlobalEnv")
-  }
+  # Here I start a vector that just contains if a Parasite is alive or not, to circumvent 
+  # all the lookups
+  if(exists("Alive.Parasite")) {rm(Alive.Parasite, pos = ".GlobalEnv")}
+  
   Alive.Parasites <<- data.table(Is.Alive = Parasite[, Alive == 1], Is.Ingested = FALSE)
+
+# Close the individual.creator.function.  
 }
 
-  # Just run the individual.creator.function once
-  individual.creator.function()
-  # Here I just have a look at the host and parasite data.table
-  head(Host, 10)
-  
+# Just run the individual.creator.function once
+individual.creator.function()
+
+# Here I just have a look at the host and parasite data.table
+head(Host, 10)
 ```
 
 ### The creation of the first individuals
-One of the first things the simulation has to do is to create the host and parasite individuals. Otherwise the simulation has nothing to calculate on. The individuals are created by a call to the individual.creator.function that is defined in the "Digital_Coevolution_Dynamics_Functions" script. It uses variables that are set in either the "Digital_Coevolution_User" script and the "Digital_Coevolution_Parameterspace" script. That includes variables that will regularly be changed like the number of replicates, and variables that will be changed less often, like the allocation of resources to reproduction.  
+One of the first things the simulation has to do is to create the host and parasite individuals. Otherwise the simulation has nothing to calculate on. The individuals are created by a call to the individual.creator.function that is defined in the "Digital_Coevolution_Dynamics_Functions" script. It uses variables that are set in either the "Digital_Coevolution_User" script and the "Digital_Coevolution_Parameterspace" script. That includes variables that will regularly be changed like the number of replicates, and variables that will be changed less often, like the allocation of resources to reproduction.
 The individual.creator.function creates two data.tables, one for the host, one for the parasite, where each line corresponds to one individual.  
 
 ```{r, eval = FALSE}
-###################################################################### 
-# In this step I preallocate all the data.table space that I could be using in an attempt to speed up the simulation. 
-individual.creator.function <- function(){  
+######################################################################
+# In this step I preallocate all the data.table space that I could be using in an 
+# attempt to speed up the simulation.
+individual.creator.function <- function(){
   
-  preallocation.margin <- 10 # How many times larger is the maximum calculatable population size #15
+  preallocation.margin <- 10 # How many times larger the data.table size.
+  
   parasite.margin <- 1
-  preallocation.length <- sum(starting.population.sizes.host * replicates * preallocation.margin)
-  preallocation.parasite <- sum(starting.population.sizes.parasite * replicates * preallocation.margin * parasite.margin)
   
-  if(exists("Host")) {
-    rm(Host, pos = ".GlobalEnv")
-  }
+  preallocation.length <- 
+    sum(starting.population.sizes.host * replicates * preallocation.margin)
+  
+  preallocation.parasite <- 
+    sum(starting.population.sizes.parasite * replicates * 
+          preallocation.margin * parasite.margin)
+
+  
+  if(exists("Host")) {rm(Host, pos = ".GlobalEnv")}
+
+    
   Host <<- data.table(  
     Alive = integer(preallocation.length),
     Host.Replicate = integer(preallocation.length), 
@@ -612,7 +860,11 @@ individual.creator.function <- function(){
     Resource.Have = numeric(preallocation.length),
     Reproduction.Allocation = numeric(preallocation.length),
     Immune.Allocation = numeric(preallocation.length),
-    Immune.Genotype = factor(sample(c(1 : host.genotypes),size = preallocation.length,prob = rep(1 / host.genotypes,host.genotypes), replace = T), levels = c(1 : host.genotypes)),
+    Immune.Genotype = factor(sample(c(1 : host.genotypes), 
+                                    size = preallocation.length, 
+                                    prob = rep(1 / host.genotypes,host.genotypes), 
+                                    replace = T), 
+                             levels = c(1 : host.genotypes)),
     Resource.In = numeric(preallocation.length),
     Resource.Work = numeric(preallocation.length),
     Reproduction.Have = numeric(preallocation.length),
@@ -625,51 +877,77 @@ individual.creator.function <- function(){
     Host.Generation = integer(preallocation.length),
     Origin = integer(preallocation.length)
   )
+
+  # Here I initialize the starter populations.
+  # Replicate, this way I hope to paralellize the replicate calculations.
+  Host[, Host.Replicate := 
+         c(rep(1 : replicates, 
+               each = sum(starting.population.sizes.host)), 
+           integer(preallocation.length - sum(starting.population.sizes.host) * 
+                     replicates))]
   
-  ### Here I initialize the starter populations
-  # Replicate, this way I hope to paralellize the replicate calculations
-  Host[, Host.Replicate := c(rep(1 : replicates, each = sum(starting.population.sizes.host)), integer(preallocation.length - sum(starting.population.sizes.host) * replicates))]
   # Alive variable, 1 = alive, 0 = not alive
   Host[Host.Replicate != 0, Alive := 1L] 
+  
   # Population
-  Host[Alive == 1, Host.Population := as.integer(rep(1 : number.populations.host, times = starting.population.sizes.host)), by = Host.Replicate]
+  Host[Alive == 1, Host.Population := 
+         as.integer(rep(1 : number.populations.host, 
+                        times = starting.population.sizes.host)), 
+       by = Host.Replicate]
+  
   # Age
   Host[Alive == 1, Age := 1L]
+    
   # Resource.Have
   Host[Alive == 1, Resource.Have := 1]
+    
   # Resource.In, meaning that the starters start with a full belly
   Host[Alive == 1, Resource.In := 1]
+    
   # Reproduction.Allocation
   Host[Alive == 1, Reproduction.Allocation := reproduction.allocation]
+    
   # Immune.Allocation
   Host[Alive == 1, Immune.Allocation := immune.allocation]  
+    
   # Immune.Genotype, has been set when initializing, needs to be cleaned
   Host[Alive == !1, Immune.Genotype := NA] 
+    
   # Infection.Genote
   Host[, Host.Infection.Genotype := NA]
+    
   # Size
   Host[Alive == 1, Size := 1]
+    
   # Host.Generation
   Host[Alive == 1, Host.Generation := 1L]
+    
   # Origin
-  Host[Alive == 1, Origin := Host.Population]
-  
-  # Here I start a vector that just contains if a host is alive or not, to circumvent all the lookups
-  if(exists("Alive.Host")) {
-    rm(Alive.Host, pos = ".GlobalEnv")
-  }
+    Host[Alive == 1, Origin := Host.Population]
+
+  ### 
+  # Here I start a vector that just contains if a host is alive or not, to circumvent all 
+  # the lookups.
+  if(exists("Alive.Host")) {rm(Alive.Host, pos = ".GlobalEnv")}
+    
   Alive.Hosts <<- data.table(Is.Alive = Host[, Alive == 1])
-  
+    
   # Here I initialize the parasite data.table structure
-  if(exists("Parasite")) {
-    rm(Parasite, pos = ".GlobalEnv")
-  }
+  if(exists("Parasite")) {rm(Parasite, pos = ".GlobalEnv")}
+  
+  
   Parasite <<- data.table(
     Alive = integer(preallocation.parasite),
     Parasite.Replicate = integer(preallocation.parasite), 
     Time = integer(preallocation.parasite),
     Parasite.Population = integer(preallocation.parasite),
-    Parasite.Infection.Genotype = factor(sample(c(1 : parasite.genotypes), size = preallocation.parasite, prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), levels = c(1 : parasite.genotypes)),
+    
+    Parasite.Infection.Genotype = 
+      factor(sample(c(1 : parasite.genotypes),
+                    size = preallocation.parasite, 
+                    prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), 
+             levels = c(1 : parasite.genotypes)),
+    
     Attack.Host.TempID = integer(preallocation.parasite),
     Attack.Host.Genotype = integer(preallocation.parasite),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
@@ -677,28 +955,43 @@ individual.creator.function <- function(){
     Age = integer(preallocation.parasite)
   )
   
-  # Here I initialize the starter populations for the parasite
-  # Replicate
-  Parasite[, Parasite.Replicate := c(rep(1 : replicates, each = sum(starting.population.sizes.parasite)), integer(preallocation.parasite - sum(starting.population.sizes.parasite) * replicates))]
+
+  # Here I initialize the starter populations for the parasite Replicate
+  Parasite[, Parasite.Replicate := 
+             c(rep(1 : replicates, each = sum(starting.population.sizes.parasite)),
+               integer(preallocation.parasite - 
+                         sum(starting.population.sizes.parasite) * replicates))]
+  
   # Alive variable, 1 = alive, 0 = not alive
   Parasite[Parasite.Replicate != 0, Alive := 1L]
+  
   # Population
-  Parasite[Alive == 1, Parasite.Population := as.integer(rep(1 : number.populations.parasite, times = starting.population.sizes.parasite)), by = Parasite.Replicate]
+  Parasite[Alive == 1, 
+           Parasite.Population := 
+             as.integer(rep(1 : number.populations.parasite, 
+                            times = starting.population.sizes.parasite)), 
+           by = Parasite.Replicate]
+  
   # Age 
   Parasite[Alive == 1, Age := 1L]
+  
   # Infection.Genotype, has been set when initializing, needs to be cleaned
   Parasite[Alive != 1, Parasite.Infection.Genotype := NA]
+  
   # Atack.Host.Rownumber
   Parasite[, Attack.Host.TempID := NA]
+  
   # Atack.Host.Genotype
   Parasite[, Attack.Host.Genotype := NA]
   
-  # Here I start a vector that just contains if a Parasite is alive or not, to circumvent all the lookups
-  if(exists("Alive.Parasite")) {
-    rm(Alive.Parasite, pos = ".GlobalEnv")
-  }
+  # Here I start a vector that just contains if a Parasite is alive or not, to circumvent 
+  # all the lookups
+  if(exists("Alive.Parasite")) {rm(Alive.Parasite, pos = ".GlobalEnv")}
+  
   Alive.Parasites <<- data.table(Is.Alive = Parasite[, Alive == 1], Is.Ingested = FALSE)
-}  
+
+# Close the individual.creator.function.  
+}
 ```
 
 ### Dead or alive?
@@ -706,28 +999,30 @@ The agents of the Digital_Coevolution simulation can be, much like biological in
 For the host agents, the "Alive.Hosts" vector is created like this:  
 
 ```{r, eval = FALSE}
-  # Here I start a vector that just contains if a host is alive or not, to circumvent all the lookups
-  Alive.Hosts <<- data.table(Is.Alive = Host[, Alive == 1])
+# Here I start a vector that just contains if a host is alive or not, to circumvent all 
+# the lookups.
+Alive.Hosts <<- data.table(Is.Alive = Host[, Alive == 1])
 ```
 
 And everytime the aliveness status of an agent changes, it is updated like this:  
 
 ```{r, eval = FALSE}
-  set(Alive.Hosts, j = "Is.Alive", value = Host[, Alive == 1])
+set(Alive.Hosts, j = "Is.Alive", value = Host[, Alive == 1])
 ```
 
 And it is used like this:  
 
 ```{r, eval = FALSE}
-  ## Host migration function 
+# Host migration function.
 host.migration.function <- function(){
-  Host[Alive.Hosts$Is.Alive, 
-       Host.Population := base:::sample(1 : number.populations.host, 
-                                        size = .N, 
-                                        prob = migration.matrix.host[Host.Population[1], ], 
-                                        replace = TRUE),
+  Host[Alive.Hosts$Is.Alive,
+       Host.Population := 
+         base:::sample(1 : number.populations.host, 
+                       size = .N, 
+                       prob = migration.matrix.host[Host.Population[1], ], 
+                       replace = TRUE), 
        by = list(Host.Population, Host.Replicate)]
-} 
+  } 
 ```
 
 ### Setting global values
@@ -741,64 +1036,82 @@ Those variables are mostly set in one of two places. The first place to define v
 host.size <- "OFF" 
 age.threshold.host <- 30
 resource.threshold.host <- 0.2
-reproduction.threshold.host <- 2 # with host.size off and a resource grain of 10, a reproduction threshold of 2 should lead to a first clutch at an age of 10. # Ancient param: 10
-reproduction.factor.host <- 4 #6
+reproduction.threshold.host <- 2 
+reproduction.factor.host <- 4 
 reproduction.allocation <- 0.35
 immune.allocation <- 0.35
 
-#Parasite internal dynamic parameters
+# Parasite internal dynamic parameters
 parasite.genotypes <- host.genotypes
-age.threshold.parasite <- 60 #60
-reproduction.threshold.parasite <- 2 #4
-reproduction.factor.parasite <- 23 #23
+age.threshold.parasite <- 60 
+reproduction.threshold.parasite <- 2 
+reproduction.factor.parasite <- 23 
 
-#Infection dynamic parameters
-infection.table <- matrix((1 - parasite.specificity), nrow = host.genotypes, ncol = parasite.genotypes)   # row is host, column is parasite
+# Infection dynamic parameters, row is host, column is parasite
+infection.table <- matrix((1 - parasite.specificity), 
+                          nrow = host.genotypes, 
+                          ncol = parasite.genotypes) 
 diag(infection.table) <- 1
-infection.growth.factor <- 1.15 # This factor gives the per time unit growth of a infection, in percent
 
-# Genetic parameters
-#neutral.mutation.rate <- 0.001
+# This factor gives the per time unit growth of a infection, in percent
+infection.growth.factor <- 1.15 
 
 # Resource parameters
-resource.grain <- 10 # This is the modifier that can increase or decrease the variance in resource distribution. The higher the number the less variance. With value 1 its a normal poisson distribution
+# This is the modifier that can increase or decrease the variance in resource 
+# distribution. The higher the number the less variance. With value 1 its a normal 
+# poisson distribution.
+resource.grain <- 10 
 
 ######################################################################
 ######################################################################
-# Here at the same time the number of populations and their size are set. For each population define explicitly the amount of resources it receives daily. Currently, population size settles at about half the resources given. 
+# Here at the same time the number of populations and their size are set. For each 
+# population define explicitly the amount of resources it receives daily. Currently, 
+# population size settles at about half the resources given.
 resources.host <- host.populations
-######################################################################
+
+###
 number.populations.host <- length(resources.host)
 populations.host <- c(1 : number.populations.host)
 starting.population.sizes.host <- ceiling(resources.host / 2)
-#############
+
+###
 number.populations.parasite <- number.populations.host
 populations.parasite <- c(1 : number.populations.parasite)
 starting.population.sizes.parasite <- ceiling(resources.host * 10)
 
-######################################################################
+###
 # External Population dynamic parameters:
-migration.matrix.host <- matrix((host.migration / number.populations.host), nrow = number.populations.host, ncol = number.populations.host)
-diag(migration.matrix.host) <- diag(migration.matrix.host) + (1 - host.migration)
+migration.matrix.host <- matrix((host.migration / number.populations.host), 
+                                nrow = number.populations.host, 
+                                ncol = number.populations.host)
 
-migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), nrow = number.populations.parasite, ncol = number.populations.parasite)
-diag(migration.matrix.parasite) <- diag(migration.matrix.parasite) + (1 - parasite.migration)
+diag(migration.matrix.host) <- 
+  diag(migration.matrix.host) + (1 - host.migration)
+
+migration.matrix.parasite <- matrix((parasite.migration / number.populations.parasite), 
+                                    nrow = number.populations.parasite, 
+                                    ncol = number.populations.parasite)
+
+diag(migration.matrix.parasite) <- 
+  diag(migration.matrix.parasite) + (1 - parasite.migration)
 
 ```
 
+\newpage
 ## The simulation process
 
 ### The dynamics wrapper
 We are approaching the heart of the Digital_Coevolution simulation. All of the biological logic that was explained in part one of this document results in functions. Functions in R are collections of code that are defined under a common name and will be executed once the function is called. In the Digital_Coevolution simulation, each of the distinct within agent and between agent dynamics that were explained in part one is defined as a sepparate function. The migration function of the host for example is designed like this:  
 
 ```{r, eval = FALSE}
-  ## Host migration function
+# Host migration function.
 host.migration.function <- function(){
   Host[Alive.Hosts$Is.Alive, 
-       Host.Population := base:::sample(1 : number.populations.host, 
-                                        size = .N, 
-                                        prob = migration.matrix.host[Host.Population[1], ], 
-                                        replace = TRUE),
+       Host.Population := 
+         base:::sample(1 : number.populations.host, 
+                       size = .N, 
+                       prob = migration.matrix.host[Host.Population[1], ], 
+                       replace = TRUE), 
        by = list(Host.Population, Host.Replicate)]
 } 
 ```
@@ -807,7 +1120,9 @@ Having all the different rules for dynamic behaviour of the agents defined as se
 Nevertheless, every timestep all of the functions that govern the agents will have to be called once for a full agent life cycle. To achieve that, and to ensure consistent order in the calling of functions, they will be wrapped in another function that is called "dynamics.wrapper" in the simulation. All this dynamics wrapper does is simply calling the functions that define the agents behaviour one after another. One call of the dynamics.wrapper function is one time-step in the simulation.  
 
 ```{r, eval = FALSE}
-# Here I will combine all the functions defined above into one wrapper function to be called. One call is one timestep. The order of the function can have an influence on the dynamics of the thing
+# Here I will combine all the functions defined above into one wrapper function to be 
+# called. One call is one timestep. The order of the function can have an influence on 
+# the dynamics of the thing.
 dynamics.wrapper <- function(){
   time.function()
   senescence.function()
@@ -826,7 +1141,9 @@ dynamics.wrapper <- function(){
 Just running the Digital_Coevolution simulation through time-steps is nice and dandy, but somehow we have to get at what is happening to the host agents and parasite agents during this simulation. In order to do that, the dynamics.wrapper function also contains a piece of code that will save the complete host agent and parasite agent population to a file on the disc. This means we get a complete snapshot of every single agent, all its internal states like reproduction, infection, resources and so on whenever we wish. Long simulations with large populations will create big data files, so keep that in mind when using Digital_Coevolution. This data extracting process is implemented using the fwrite function from the data.table package in append mode. This means that whenever it is invoked, it will take both the host and parasite agent population data.tables and save it to disk. Instead of creating a new file for every time a copy is saved, the append mode uses the same data file everytime, and simply adds the new data at the bottom of it. This is where all the identifiers for time and replicate come in handy, as it allow us to filter the resulting dataset very precisely. The "by = " argument in the "if" statement that wraps the fwrite adjusts the resolution of the data saving. A value of 1 will save the state of all agents every timestep. A value of ten will save the state of all agents only every tenth timestep. This can be used to greatly reduce the size of the resulting data file for simulation runs over many timesteps. It can also be used to speed up the simulation, as writing to disk can take a lot of time. The fwrite function is already optimized to be fast, but if an older system with a harddrive instead of a solid state drive is used can nevertheless use up quite some time. For long simulations, it is worth it to consider if it is necessary to save every timestep, or if less data is sufficient as well.  
 
 ```{r, eval = FALSE}
-# Here I will combine all the functions defined above into one wrapper function to be called. One call is one timestep. The order of the function can have an influence on the dynamics of the thing
+# Here I will combine all the functions defined above into one wrapper function to be 
+# called. One call is one timestep. The order of the function can have an influence on 
+# the dynamics of the thing.
 dynamics.wrapper <- function(){
   time.function()
   senescence.function()
@@ -838,12 +1155,21 @@ dynamics.wrapper <- function(){
   host.reproduction.function()
   host.migration.function()
   parasite.migration.function()
-  # result saving 
-  if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
-    fwrite(Host[Alive.Hosts$Is.Alive], file = 
-             paste(result.file.location, result.file.name, "_Host_", run.date, ".csv", sep = ""), append = TRUE)
-    fwrite(Parasite[Alive.Parasites$Is.Alive], file = 
-             paste(result.file.location, result.file.name, "_Parasite_", run.date, ".csv", sep = ""), append = TRUE)    
+  # result saving
+if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
+  fwrite(
+    Host[Alive.Hosts$Is.Alive], 
+    file = 
+      paste(
+        result.file.location, result.file.name, "_Host_", run.date, ".csv", sep = ""), 
+    append = TRUE)
+  
+  fwrite(
+    Parasite[Alive.Parasites$Is.Alive], 
+    file = 
+      paste(
+        result.file.location, result.file.name, "_Parasite_", run.date, ".csv", sep = ""), 
+    append = TRUE)
   }
 }
 ```
@@ -852,8 +1178,8 @@ dynamics.wrapper <- function(){
 The simulation is implemented as a time forward simulation, meaning that each timestep is calculated consecutively and dependent on the last timestep. At each timestep in a defined interval the whole population gets copied to a results database. This necessitates a time identifier. It is implemented as a integer counter that updates each timestep.  
 
 ```{r, eval = FALSE}
-  Host[, Time := Time + 1L]
-  Parasite[, Time := Time + 1L]
+Host[, Time := Time + 1L]
+Parasite[, Time := Time + 1L]
 ```
 
 ### Time-forward simulation
@@ -862,11 +1188,11 @@ The time-forward property of the Digital_Coevolution is simply implemented as a 
 This is what runs the Digital_Coevolution simulation.  
 
 ```{r, eval = FALSE}
-  # Now we run the simulation
-  # Because it is a time forward simulation it is necessary to loop through the timesteps. 
-  for(i in 1 : duration.days){
-    dynamics.wrapper()
-  }
+# Now we run the simulation
+# Because it is a time forward simulation it is necessary to loop through the timesteps. 
+for(i in 1 : duration.days){
+  dynamics.wrapper()
+}
 ```
 
 -------------------------------------------------------------------------------------------------
@@ -875,8 +1201,7 @@ This is what runs the Digital_Coevolution simulation.
 \newpage
 
 # Part Three: Using the Digital_Coevolution simulation
-The Digital_Coevolution simulation currently consits of three to four interdependent R scripts. In oder to be able to run the Digital_Coevolution simulation yourself, you simply have to to download or copy the relevant scripts from the github repository to your computer. From then on it depends if you just want to run a local session, if you want to run it on a server, or if you want to run it on a cluster computer.  
-This part of the document explains the three different use scenarios.  
+The Digital_Coevolution simulation currently consits of three to four interdependent R scripts. In oder to be able to run the Digital_Coevolution simulation yourself, you simply have to to download or copy the relevant scripts from the github repository to your computer.  
 
 ## Digital_Coevolution on your local machine
 ### Getting Digital_Coevolution simulation on your computer
@@ -888,9 +1213,9 @@ Open the "Digital_Coevolution_User.R" file in your favourite editor. There is on
 A bit further down in the script you have to specify the file path where the simulation should save the results. It can be the same folder than the scripts. And even a bit further down you have to name the result file. Make it a rememberable and also meaningfull name, so that later you still know what was done in that simulation.  
 
 ```{r, eval = FALSE}
-#########################################
-### User script for Digital_Organism ####
-#########################################
+############################################
+### User script for Digital_Coevolution ####
+############################################
 
 ## This is the script you should be working with when you
 ## want to use the Digital_Organism.
@@ -907,7 +1232,7 @@ A bit further down in the script you have to specify the file path where the sim
 
 # Please type the full path to the folder that contains 
 # the .R files, including this one.
-source.file.location <- "C://Local_Documents/PHD/R code/Digital_Daphnia/Digital_Coevolution/"
+source.file.location <- "/home/example/path/to/Rscripts/"
 
 ###########################################################
 ## The next thing to do is to define where the script 
@@ -917,14 +1242,14 @@ source.file.location <- "C://Local_Documents/PHD/R code/Digital_Daphnia/Digital_
 
 # Please type the full path to the folder where results 
 # should be saved.
-result.file.location <- "C://Local_Documents/PHD/Data/Digital_Daphnia/"
+result.file.location <- "/home/example/path/to/results/"
 
 ###########################################################
 ## Now we need a name to identify the results.
 ## The result file will anyway have the name :
-## "Digital_Coevolution_Results_NodeID_Sys.Date_", 
+## "Digital_Coevolution_Results_Sys.Date_", 
 ## your filename will be added at the end of that.
-result.file.name <- "5Genotypes"
+result.file.name <- "YourResultNameHere"
 ```
 
 The remainder of the file allows you to set some of the parameters of the simulation. This is where stuff gets interesting, and you should play around with the values. Don't worry, here you should not be able to break the simulation. You can for example set how many host populations should be simulated. And how large they should be. Or how virulent the parasite should be. If you specify too large host populations and a too long duration.days at the same time, the simulation will take a very long time and produce a very large result data set. How long a run of the simulation actually takes is anyones guess, as that depends heavily on the abilities of your local machine. Best would be to start small and work your way up.  
@@ -1006,8 +1331,13 @@ The last thing you need to do in order to run the Digital_Coevolution simulation
 ###########################################################
 ## This sources a helper script that runs the simulation. 
 print(paste("Simulation started :", Sys.time()))
-source(file =  paste(source.file.location, "Digital_Coevolution_Run.R", sep = ""), local = TRUE)
-print("Congratulations, you have successfully run the Digital_Coevolution simulation. Now go and check out those amazing results.")
+
+source(file =  
+         paste(source.file.location, "Digital_Coevolution_Run.R", sep = ""), 
+       local = TRUE)
+print("Congratulations, you have successfully run the Digital_Coevolution simulation. 
+  Now go and check out those amazing results.")
+
 print(paste("Simulation ended", Sys.time()))
 ``` 
 
@@ -1017,12 +1347,11 @@ The results will be three files in the folder that you have specified in the "_U
 
 --------------
 
-<br>
 \newpage
 
 # Final remarks
 Writing the Digital_Coevolution simulation has been great fun, and probably one of the most instructive experiences that I ever had. There is some truth in the saying that you have not understood something completely before you can not build it yourself. Trying to build this agent based simulation and reflecting how those agents have to behave lead me to have some great realisations on how complex and fascinating life is, and how little we actually understand. It made me read far more papers in a far broader aray of topics than I would have initially imagined, and I would not miss a bit of it.  
-Enough of the ramblings though, the Digital_Coevolution simulation is a purpose built tool that I have created to answer some questions in host parasite coevolution. By training I am a biologist, so writing this simulation has also been an experience in writing R. Therefore this has to be regarded as an amateur built piece of software. I am sure there are some mistakes in it. I hope that by providing the source code on github, some of those might be found. And I appologize already in advance, if in the future this simulation will not be updated as regularly, or if bugfixes and issues take a long time.  
+The Digital_Coevolution simulation is a purpose built tool that I have created to answer some questions in host parasite coevolution. By training I am a biologist, so writing this simulation has also been an experience in writing R. Therefore this has to be regarded as an amateur built piece of software. I am sure there are some mistakes in it. I hope that by providing the source code on github, some of those might be found. And I appologize already in advance, if in the future this simulation will not be updated as regularly, or if bugfixes and issues take a long time.  
 Last but not least: Have fun, explore, stay curious.  
 
 Cheers  
@@ -1036,6 +1365,8 @@ Robert
 `r knitr::knit_exit()`
 
 ```{r}
+      
+##########################################################################################
 ```
 
 ### Run several parameters on your local machine
