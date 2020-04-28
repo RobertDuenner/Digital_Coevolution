@@ -90,7 +90,7 @@ individual.creator.function <- function(){
     Parasite.Population = integer(preallocation.parasite),
     Parasite.Infection.Genotype = factor(sample(c(1 : parasite.genotypes), size = preallocation.parasite, prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), levels = c(1 : parasite.genotypes)),
     Attack.Host.TempID = integer(preallocation.parasite),
-    Attack.Host.Genotype = integer(preallocation.parasite),
+    Attack.Host.Genotype = factor(sample(c(1 : parasite.genotypes), size = preallocation.parasite, prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), levels = c(1 : parasite.genotypes)), # integer(preallocation.parasite),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
     Ingested = integer(preallocation.parasite),
     Age = integer(preallocation.parasite)
@@ -366,11 +366,4 @@ dynamics.wrapper <- function(){
   host.reproduction.function()
   host.migration.function()
   parasite.migration.function()
-  # result saving 
-  if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
-    fwrite(Host[Alive.Hosts$Is.Alive], file = 
-             paste(result.file.location, result.file.name, "_Host_", run.date, ".csv", sep = ""), append = TRUE)
-    fwrite(Parasite[Alive.Parasites$Is.Alive], file = 
-             paste(result.file.location, result.file.name, "_Parasite_", run.date, ".csv", sep = ""), append = TRUE)    
-  }
 }

@@ -774,7 +774,10 @@ individual.creator.function <- function(){
              levels = c(1 : parasite.genotypes)),
     
     Attack.Host.TempID = integer(preallocation.parasite),
-    Attack.Host.Genotype = integer(preallocation.parasite),
+    Attack.Host.Genotype = factor(sample(c(1 : parasite.genotypes),
+                    size = preallocation.parasite, 
+                    prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), 
+             levels = c(1 : parasite.genotypes)),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
     Ingested = integer(preallocation.parasite),
     Age = integer(preallocation.parasite)
@@ -949,7 +952,10 @@ individual.creator.function <- function(){
              levels = c(1 : parasite.genotypes)),
     
     Attack.Host.TempID = integer(preallocation.parasite),
-    Attack.Host.Genotype = integer(preallocation.parasite),
+    Attack.Host.Genotype = factor(sample(c(1 : parasite.genotypes),
+                    size = preallocation.parasite, 
+                    prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), 
+             levels = c(1 : parasite.genotypes)),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
     Ingested = integer(preallocation.parasite),
     Age = integer(preallocation.parasite)
@@ -1138,40 +1144,71 @@ dynamics.wrapper <- function(){
 ```
 
 ### Getting Results
-Just running the Digital_Coevolution simulation through time-steps is nice and dandy, but somehow we have to get at what is happening to the host agents and parasite agents during this simulation. In order to do that, the dynamics.wrapper function also contains a piece of code that will save the complete host agent and parasite agent population to a file on the disc. This means we get a complete snapshot of every single agent, all its internal states like reproduction, infection, resources and so on whenever we wish. Long simulations with large populations will create big data files, so keep that in mind when using Digital_Coevolution. This data extracting process is implemented using the fwrite function from the data.table package in append mode. This means that whenever it is invoked, it will take both the host and parasite agent population data.tables and save it to disk. Instead of creating a new file for every time a copy is saved, the append mode uses the same data file everytime, and simply adds the new data at the bottom of it. This is where all the identifiers for time and replicate come in handy, as it allow us to filter the resulting dataset very precisely. The "by = " argument in the "if" statement that wraps the fwrite adjusts the resolution of the data saving. A value of 1 will save the state of all agents every timestep. A value of ten will save the state of all agents only every tenth timestep. This can be used to greatly reduce the size of the resulting data file for simulation runs over many timesteps. It can also be used to speed up the simulation, as writing to disk can take a lot of time. The fwrite function is already optimized to be fast, but if an older system with a harddrive instead of a solid state drive is used can nevertheless use up quite some time. For long simulations, it is worth it to consider if it is necessary to save every timestep, or if less data is sufficient as well.  
+Just running the Digital_Coevolution simulation through time-steps is nice and dandy, but somehow we have to get at what is happening to the host agents and parasite agents during this simulation. In order to do that there is a piece of code in the Digital_Coevolution_Run.R script that will save a copy the complete host agent and parasite agent population to a file on the disc. This means we get a complete snapshot of every single agent, all its internal states like reproduction, infection, resources and so on whenever we wish. Long simulations with large populations will create big data files, so keep that in mind when using Digital_Coevolution. This data extracting process is implemented using the fwrite function from the data.table package in append mode. This means that whenever it is invoked, it will take both the host and parasite agent population data.tables and save it to disk. Instead of creating a new file for every time a copy is saved, the append mode uses the same data file everytime, and simply adds the new data at the bottom of it. This is where all the identifiers for time and replicate come in handy, as it allow us to filter the resulting dataset very precisely. The "by = " argument in the "if" statement that wraps the fwrite adjusts the resolution of the data saving. A value of 1 will save the state of all agents every timestep. A value of ten will save the state of all agents only every tenth timestep. This can be used to greatly reduce the size of the resulting data file for simulation runs over many timesteps. It can also be used to speed up the simulation, as writing to disk can take a lot of time. The fwrite function is already optimized to be fast, but if an older system with a harddrive instead of a solid state drive is used can nevertheless use up quite some time. For long simulations, it is worth it to consider if it is necessary to save every timestep, or if less data is sufficient as well.  
+There is also a toggle that allows you to get a summarized report instead of a raw copy of the host and parasite agent states (see part three, section "running the Digital_Coevolution simulation on your local machine"). If that toggle is enabled, then instead of a raw copy, a summary report will be created at each reporting time step. That summary includes the number of host or parasite individuals per genotype per sub- or metapopulation and the number of infections. It lacks some of the details of the raw data, but is a much more handeable dataset. 
 
 ```{r, eval = FALSE}
-# Here I will combine all the functions defined above into one wrapper function to be 
-# called. One call is one timestep. The order of the function can have an influence on 
-# the dynamics of the thing.
-dynamics.wrapper <- function(){
-  time.function()
-  senescence.function()
-  host.resource.function()
-  infection.function()
-  host.exposure.function()
-  parasite.reproduction.function()
-  metabolism.function()
-  host.reproduction.function()
-  host.migration.function()
-  parasite.migration.function()
-  # result saving
-if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
-  fwrite(
-    Host[Alive.Hosts$Is.Alive], 
-    file = 
-      paste(
-        result.file.location, result.file.name, "_Host_", run.date, ".csv", sep = ""), 
-    append = TRUE)
-  
-  fwrite(
-    Parasite[Alive.Parasites$Is.Alive], 
-    file = 
-      paste(
-        result.file.location, result.file.name, "_Parasite_", run.date, ".csv", sep = ""), 
-    append = TRUE)
+# Because it is a time forward simulation it is necessary to loop through the timesteps. We do that by calling the dynamics.wrapper function within a loop. 
+# The dynamics.wrapper contains all the functions that guide the dynamics of the individuals in each timestep (as for example the host.reproduction.function).
+for(i in 1 : duration.days){
+  dynamics.wrapper()
+  # result saving 
+  if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
+    if(raw.results){
+      fwrite(Host[Alive.Hosts$Is.Alive], file = 
+               paste(result.file.location, result.file.name, "_Host_", run.date, "_raw_", ".csv", sep = ""), append = TRUE)
+      fwrite(Parasite[Alive.Parasites$Is.Alive], file = 
+               paste(result.file.location, result.file.name, "_Parasite_", run.date, "_raw_", ".csv", sep = ""), append = TRUE)
+    } 
+    if(summarized.results) {
+      temp.data.host <- copy(Host)
+      temp.data.host[, Virulence := virulence]
+      temp.data.host[, Popsize := host.populations[1]]
+      temp.data.host[, Random.Drift := random.drift]
+      temp.data.host[, Parasite.Connection := parasite.migration]
+      temp.data.host[, Host.Connection := host.migration]
+      temp.data.host[, Host.Time := Time]
+      
+      temp.data.host[, Host.Number.Individuals := .N, by = list(Host.Time, Host.Replicate, Host.Population, Immune.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Host.Population.Size := .N, by = list(Host.Time, Host.Replicate, Host.Population, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Host.Number.Individuals.Between := .N, by = list(Host.Time, Host.Replicate, Immune.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Host.Population.Size.Between := .N, by = list(Host.Time, Host.Replicate, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Epidemic.Size.Within := sum(Infection.State), by = list(Host.Time, Host.Replicate, Host.Population, Immune.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Epidemic.Size.Total := sum(Infection.State), by = list(Host.Time, Host.Replicate, Host.Population, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      
+      #########
+      temp.data.parasite <- copy(Parasite)
+      temp.data.parasite[, Virulence := virulence]
+      temp.data.parasite[, Popsize := host.populations[1]]
+      temp.data.parasite[, Random.Drift := random.drift]
+      temp.data.parasite[, Parasite.Connection := parasite.migration]
+      temp.data.parasite[, Host.Connection := host.migration]
+      temp.data.parasite[, Parasite.Time := Time]
+      
+      temp.data.parasite[, Parasite.Number.Individuals := .N, by = list(Parasite.Time, Parasite.Replicate, Parasite.Population, Parasite.Infection.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.parasite[, Parasite.Population.Size := .N, by = list(Parasite.Time, Parasite.Replicate, Parasite.Population, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.parasite[, Parasite.Number.Individuals.Between := .N, by = list(Parasite.Time, Parasite.Replicate, Parasite.Infection.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.parasite[, Parasite.Population.Size.Between := .N, by = list(Parasite.Time, Parasite.Replicate, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      
+      #########
+      temp.data.host[, Total.Parasite.Number.Individuals := Epidemic.Size.Within + temp.data.parasite[Parasite.Replicate == Host.Replicate[1] & Parasite.Population == Host.Population[1] & Parasite.Time == Host.Time[1] & Parasite.Infection.Genotype == Immune.Genotype[1], .N], by = list(Host.Time, Host.Replicate, Host.Population, Immune.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Total.Parasite.Population.Size := Epidemic.Size.Total + temp.data.parasite[Parasite.Replicate == Host.Replicate[1] & Parasite.Population == Host.Population[1] & Parasite.Time == Host.Time[1], .N], by = list(Host.Time, Host.Replicate, Host.Population, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Total.Parasite.Number.Individuals.Between := Epidemic.Size.Within + temp.data.parasite[Parasite.Replicate == Host.Replicate[1] & Parasite.Population == Host.Population[1] & Parasite.Time == Host.Time[1] & Parasite.Infection.Genotype == Immune.Genotype[1], .N], by = list(Host.Time, Host.Replicate, Immune.Genotype, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Total.Parasite.Population.Size.Between := Epidemic.Size.Total + temp.data.parasite[Parasite.Replicate == Host.Replicate[1] & Parasite.Population == Host.Population[1] & Parasite.Time == Host.Time[1], .N], by = list(Host.Time, Host.Replicate, Virulence, Popsize, Parasite.Connection, Host.Connection)]
+      
+      #########
+      fwrite(
+        unique(temp.data.host[, list(Host.Time, Host.Replicate, Host.Population, Immune.Genotype, Virulence, Popsize, Random.Drift, Parasite.Connection, Host.Connection, Host.Number.Individuals, Host.Population.Size, Host.Number.Individuals.Between, Host.Population.Size.Between, Epidemic.Size.Within, Epidemic.Size.Total, Total.Parasite.Number.Individuals, Total.Parasite.Population.Size, Total.Parasite.Number.Individuals.Between, Total.Parasite.Population.Size.Between, Origin)]), 
+        file = paste(result.file.location, result.file.name, "_Host_", run.date, "_summarized_", ".csv", sep = ""), append = TRUE)
+      
+      fwrite(
+        unique(temp.data.parasite[, list(Parasite.Time, Parasite.Replicate, Parasite.Population, Parasite.Infection.Genotype, Virulence, Popsize, Random.Drift, Parasite.Connection, Host.Connection, Parasite.Number.Individuals, Parasite.Population.Size, Parasite.Number.Individuals.Between, Parasite.Population.Size.Between)]), 
+        file = paste(result.file.location, result.file.name, "_Parasite_", run.date, "_summarized_", ".csv", sep = ""), append = TRUE)
+      
+    }
   }
 }
+
 ```
 
 ### Time
@@ -1252,8 +1289,9 @@ result.file.location <- "/home/example/path/to/results/"
 result.file.name <- "YourResultNameHere"
 ```
 
-The remainder of the file allows you to set some of the parameters of the simulation. This is where stuff gets interesting, and you should play around with the values. Don't worry, here you should not be able to break the simulation. You can for example set how many host populations should be simulated. And how large they should be. Or how virulent the parasite should be. If you specify too large host populations and a too long duration.days at the same time, the simulation will take a very long time and produce a very large result data set. How long a run of the simulation actually takes is anyones guess, as that depends heavily on the abilities of your local machine. Best would be to start small and work your way up.  
-One important setting that can help you to reduce the result file size for long simulation is the saving.interval. This simply means that every N time steps the complete host and parasite data.tables will be saved into the data file in append mode. If the setting is left at 1, the default, then every time step will be saved. If you set another value, lets say 10, then only every 10 timesteps will be saved, thus decreasing the size of the final output file by 10, but also decreasing your resolution in time. As with many things, there is a trade-off.  
+The remainder of the file allows you to set some of the parameters of the simulation. This is where stuff gets interesting, and you should play around with the values. Don't worry, here you should not be able to break the simulation. You can for example set how many host populations should be simulated. And how large they should be. Or how virulent the parasite should be. If you specify too large host populations and a too long "duration.days" at the same time, the simulation will take a very long time and produce a very large result data set. How long a run of the simulation actually takes is anyones guess, as that depends heavily on the abilities of your local machine. Best would be to start small and work your way up.  
+One important setting that can help you to reduce the result file size for long simulation is the saving.interval. This simply means that every N time steps the complete host and parasite data.tables will be saved into the data file in append mode. If the setting is left at 1, the default, then every time step will be saved. If you set another value, lets say 10, then only every 10 timesteps will be saved, thus decreasing the size of the final output file by 10, but also decreasing your resolution in time. The simulation will run slightly faster if the reporting window is larger. If the reporting window is set to the same value as the duration of the simulation in "duration.days", then only the starting and the ending state of the simulation will be saved. As with many things, there is a trade-off.  
+You will also find settings called "raw.results" and "summarized.results". There you can adjust if you want the raw results, meaning if a copy of the state of each host and parasite agent that exists in the simulation at the time of the reporting should be saved, or if you want the results to be summarized. The summarized results contains number of individuals per genotype, per population, per metapopulation and so on, for both host and parasite agents as well as the infection state. Calculating the summary takes slightly longer, so if you are really hard pressed for time the simulation is faster with "summarized.results" set to FALSE.  
 If you want to compare different parameter settings, you will have to do that consecutively. Set them, name the result, run the simulation, repeat. If you want to run many different parameter settings (parameter space exploration), then you will probably want to run the Digital_Coevolution simulation on a server or a cluster. Running many different parameter settings will take some time on a normal computer. Just refer to the next sections for running Digital_Coevolution on a server or cluster.  
 
 ```{r, eval = FALSE}
@@ -1272,6 +1310,11 @@ duration.days <- 1000
 # Here you can set how often a snapshot of all individuals 
 # should be saved. Every N timesteps
 saving.intervall <- 1
+
+# Here you can set if the results should be saved raw 
+# or summarized or both, logical value FALSE or TRUE
+raw.results <- TRUE
+summarized.results <- TRUE
 
 # How many replicates should there be?
 replicates <- 1

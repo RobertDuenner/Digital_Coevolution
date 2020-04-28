@@ -5,14 +5,14 @@
 ##################################################
 # Please type the full path to the folder that contains 
 # the .R files, including this one.
-source.file.location <- "/cluster/home/duennerr/Digital_Coevolution/Scripts/"
+source.file.location <- "/home/robert/PHD/Digital_Coevolution_CH1/"
 
 # Please type the full path to the folder where results 
 # should be saved.
-final.result.location <- "/cluster/scratch/duennerr/"
+final.result.location <- "/home/robert/PHD/Digital_Coevolution_CH1/Results/"
 
 # Set the working directory for within loop saving to ultra fast scratch on cluster node
-result.file.location <- "/scratch/"
+result.file.location <- "/home/robert/PHD/Digital_Coevolution_CH1/Results/"
 
 # Here you can set if the results should be saved raw 
 # or summarized or both, logical value FALSE or TRUE
@@ -23,7 +23,7 @@ summarized.results <-TRUE
 ###########################################################
 ## Below here, not much has to be changed I think.
 
-
+print("locations ok")
 
 ###########################################################
 ## Now we need a name to identify the results.
@@ -38,6 +38,8 @@ result.file.name <- paste(commandArgs(T)[4], "_", commandArgs(T)[3], sep = "")
 argvect <- unlist(strsplit(commandArgs(T)[2], split = ","))
 argnames <- unlist(strsplit(commandArgs(T)[1], split = ","))
 
+print(argnames)
+print(argvect)
 ###########################################################
 ## This part extracts the parameter values from the passed
 ## command arguments
@@ -56,6 +58,8 @@ for (i in 1:length(grep(pattern = "host.population", x = argnames, ignore.case =
 host.populations <- c(as.numeric(argvect[grep(pattern = "host.population", x = argnames, ignore.case = TRUE, value = FALSE)])) 
 host.populations <- host.populations[host.populations != 0]
 
+print(host.populations)
+print("host.populations ok")
 ####################
 
 #host.population.1 <- as.numeric(argvect[grep(pattern =  "host.population.1", x = argnames, ignore.case = TRUE, value = FALSE)])
@@ -86,6 +90,7 @@ random.drift <- as.numeric(argvect[grep(pattern =  "random.drift", x = argnames,
 
 # Read in the date, so that stuff can run over night without causing trouble
 run.date <- Sys.Date()
+print("arguments ok")
 
 # Load data.table library
 library(data.table)
@@ -101,11 +106,13 @@ saveRDS(as.list(.GlobalEnv),file =
 # Source the main body of the simulation that includes all dynamics functions
 source(file =  paste(source.file.location, "Digital_Coevolution_Dynamics_Functions.R", sep = ""), local = TRUE)
 
+print("sourcing ok")
 ######################################################################################################################################
 ### Now we run the simulation
 # As a first step we need to create the individuals that are the core of this individual based simulation.
 # We do that by calling the individual.creator.function that was sourced in the Main_Body_Digital_Coevolution.R
 individual.creator.function() # That's it
+print("individuals created")
 
 # Because it is a time forward simulation it is necessary to loop through the timesteps. We do that by calling the dynamics.wrapper function within a loop. 
 # The dynamics.wrapper contains all the functions that guide the dynamics of the individuals in each timestep (as for example the host.reproduction.function).
@@ -167,12 +174,12 @@ for(i in 1:duration.days){
     }
   }
 }
-
+print("simulation ok")
 #############################################
 # As this is the version of the script that is supposed to run on the euler cluster
 # we need to move the file from the scratch to the final location
 file.copy(from = paste(result.file.location, list.files(path = result.file.location), sep = ""), to = final.result.location, overwrite = FALSE)
-
+print("file copying ok")
 ##############################################################################
 ### Post processing
 # Loading the accumulated dataset, calculate some summary statistics and metrics, get rid of duplicate entries, and save a smaller dataset. This saves time and discspace.
