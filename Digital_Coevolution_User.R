@@ -36,6 +36,7 @@ result.file.location <- "/home/robert/PHD/Digital_Coevolution_CH1/Results/"
 ## your filename will be added at the end of that.
 result.file.name <- "OldTest"
 
+###########################################################
 # Here you can set if the results should be saved raw 
 # or summarized or both, logical value FALSE or TRUE
 raw.results <- FALSE

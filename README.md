@@ -930,16 +930,16 @@ of the
     ##  9:     1              1    0               1                    <NA>   1
     ## 10:     1              1    0               1                    <NA>   1
     ##     Resource.Have Reproduction.Allocation Immune.Allocation Immune.Genotype
-    ##  1:             1                    0.35              0.35               3
-    ##  2:             1                    0.35              0.35               5
-    ##  3:             1                    0.35              0.35               5
-    ##  4:             1                    0.35              0.35               2
-    ##  5:             1                    0.35              0.35               3
+    ##  1:             1                    0.35              0.35               4
+    ##  2:             1                    0.35              0.35               3
+    ##  3:             1                    0.35              0.35               1
+    ##  4:             1                    0.35              0.35               5
+    ##  5:             1                    0.35              0.35               1
     ##  6:             1                    0.35              0.35               3
-    ##  7:             1                    0.35              0.35               4
-    ##  8:             1                    0.35              0.35               1
-    ##  9:             1                    0.35              0.35               1
-    ## 10:             1                    0.35              0.35               4
+    ##  7:             1                    0.35              0.35               2
+    ##  8:             1                    0.35              0.35               5
+    ##  9:             1                    0.35              0.35               4
+    ## 10:             1                    0.35              0.35               2
     ##     Resource.In Resource.Work Reproduction.Have Immune.State Infection.State
     ##  1:           1             0                 0            0               0
     ##  2:           1             0                 0            0               0
@@ -1098,7 +1098,10 @@ individual.creator.function <- function(){
              levels = c(1 : parasite.genotypes)),
     
     Attack.Host.TempID = integer(preallocation.parasite),
-    Attack.Host.Genotype = integer(preallocation.parasite),
+    Attack.Host.Genotype = factor(sample(c(1 : parasite.genotypes),
+                    size = preallocation.parasite, 
+                    prob = rep(1 / parasite.genotypes, parasite.genotypes), replace = T), 
+             levels = c(1 : parasite.genotypes)),
     Success.Parasite.Infection.Genotype = factor(NA, levels = c(1 : parasite.genotypes)),
     Ingested = integer(preallocation.parasite),
     Age = integer(preallocation.parasite)
@@ -1362,15 +1365,15 @@ dynamics.wrapper <- function(){
 Just running the Digital\_Coevolution simulation through time-steps is
 nice and dandy, but somehow we have to get at what is happening to the
 host agents and parasite agents during this simulation. In order to do
-that, the dynamics.wrapper function also contains a piece of code that
-will save the complete host agent and parasite agent population to a
-file on the disc. This means we get a complete snapshot of every single
-agent, all its internal states like reproduction, infection, resources
-and so on whenever we wish. Long simulations with large populations will
-create big data files, so keep that in mind when using
-Digital\_Coevolution. This data extracting process is implemented using
-the fwrite function from the data.table package in append mode. This
-means that whenever it is invoked, it will take both the host and
+that there is a piece of code in the Digital\_Coevolution\_Run.R script
+that will save a copy the complete host agent and parasite agent
+population to a file on the disc. This means we get a complete snapshot
+of every single agent, all its internal states like reproduction,
+infection, resources and so on whenever we wish. Long simulations with
+large populations will create big data files, so keep that in mind when
+using Digital\_Coevolution. This data extracting process is implemented
+using the fwrite function from the data.table package in append mode.
+This means that whenever it is invoked, it will take both the host and
 parasite agent population data.tables and save it to disk. Instead of
 creating a new file for every time a copy is saved, the append mode uses
 the same data file everytime, and simply adds the new data at the bottom
@@ -1386,39 +1389,179 @@ take a lot of time. The fwrite function is already optimized to be fast,
 but if an older system with a harddrive instead of a solid state drive
 is used can nevertheless use up quite some time. For long simulations,
 it is worth it to consider if it is necessary to save every timestep, or
-if less data is sufficient as
-well.
+if less data is sufficient as well.  
+There is also a toggle that allows you to get a summarized report
+instead of a raw copy of the host and parasite agent states (see part
+three, section “running the Digital\_Coevolution simulation on your
+local machine”). If that toggle is enabled, then instead of a raw copy,
+a summary report will be created at each reporting time step. That
+summary includes the number of host or parasite individuals per genotype
+per sub- or metapopulation and the number of infections. It lacks some
+of the details of the raw data, but is a much more handeable
+dataset.
 
 ``` r
-# Here I will combine all the functions defined above into one wrapper function to be 
-# called. One call is one timestep. The order of the function can have an influence on 
-# the dynamics of the thing.
-dynamics.wrapper <- function(){
-  time.function()
-  senescence.function()
-  host.resource.function()
-  infection.function()
-  host.exposure.function()
-  parasite.reproduction.function()
-  metabolism.function()
-  host.reproduction.function()
-  host.migration.function()
-  parasite.migration.function()
+# Because it is a time forward simulation it is necessary to loop through the timesteps. 
+# We do that by calling the dynamics.wrapper function within a loop. 
+# The dynamics.wrapper contains all the functions that guide the dynamics of the 
+# individuals in each timestep (as for example the host.reproduction.function).
+for(i in 1 : duration.days){
+  dynamics.wrapper()
   # result saving
-if(i %in% c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
-  fwrite(
-    Host[Alive.Hosts$Is.Alive], 
-    file = 
-      paste(
-        result.file.location, result.file.name, "_Host_", run.date, ".csv", sep = ""), 
-    append = TRUE)
+  if(i %in% 
+     c(1, seq(from = saving.intervall, to = duration.days, by = saving.intervall))){
+    if(raw.results){
+      fwrite(Host[Alive.Hosts$Is.Alive], file = 
+               paste(result.file.location, 
+                     result.file.name, 
+                     "_Host_", 
+                     run.date, 
+                     "_raw_", 
+                     ".csv", 
+                     sep = ""), append = TRUE)
+      fwrite(Parasite[Alive.Parasites$Is.Alive], file = 
+               paste(result.file.location, 
+                     result.file.name, 
+                     "_Parasite_", 
+                     run.date, 
+                     "_raw_", 
+                     ".csv", 
+                     sep = ""), append = TRUE)
+    } 
+    if(summarized.results) {
+      temp.data.host <- copy(Host)
+      temp.data.host[, Virulence := virulence]
+      temp.data.host[, Popsize := host.populations[1]]
+      temp.data.host[, Random.Drift := random.drift]
+      temp.data.host[, Parasite.Connection := parasite.migration]
+      temp.data.host[, Host.Connection := host.migration]
+      temp.data.host[, Host.Time := Time]
   
-  fwrite(
-    Parasite[Alive.Parasites$Is.Alive], 
-    file = 
-      paste(
-        result.file.location, result.file.name, "_Parasite_", run.date, ".csv", sep = ""), 
-    append = TRUE)
+      temp.data.host[, Host.Number.Individuals := .N, 
+                     by = list(Host.Time, Host.Replicate, Host.Population, 
+                               Immune.Genotype, Virulence, Popsize, Parasite.Connection,
+                               Host.Connection)]
+      temp.data.host[, Host.Population.Size := .N, 
+                     by = list(Host.Time, Host.Replicate, Host.Population, Virulence, 
+                               Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Host.Number.Individuals.Between := .N, 
+                     by = list(Host.Time, Host.Replicate, Immune.Genotype, Virulence, 
+                               Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Host.Population.Size.Between := .N, 
+                     by = list(Host.Time, Host.Replicate, Virulence, Popsize, 
+                               Parasite.Connection, Host.Connection)]
+      temp.data.host[, Epidemic.Size.Within := sum(Infection.State), 
+                     by = list(Host.Time, Host.Replicate, Host.Population, 
+                               Immune.Genotype, Virulence, Popsize, Parasite.Connection,
+                               Host.Connection)]
+      temp.data.host[, Epidemic.Size.Total := sum(Infection.State), 
+                     by = list(Host.Time, Host.Replicate, Host.Population, Virulence, 
+                               Popsize, Parasite.Connection, Host.Connection)]
+      
+      #########
+      temp.data.parasite <- copy(Parasite)
+      temp.data.parasite[, Virulence := virulence]
+      temp.data.parasite[, Popsize := host.populations[1]]
+      temp.data.parasite[, Random.Drift := random.drift]
+      temp.data.parasite[, Parasite.Connection := parasite.migration]
+      temp.data.parasite[, Host.Connection := host.migration]
+      temp.data.parasite[, Parasite.Time := Time]
+
+      temp.data.parasite[, Parasite.Number.Individuals := .N, 
+                         by = list(Parasite.Time, Parasite.Replicate, 
+                                   Parasite.Population, Parasite.Infection.Genotype, 
+                                   Virulence, Popsize, Parasite.Connection, 
+                                   Host.Connection)]
+      temp.data.parasite[, Parasite.Population.Size := .N, 
+                         by = list(Parasite.Time, Parasite.Replicate, Parasite.Population, 
+                                   Virulence, Popsize, Parasite.Connection, 
+                                   Host.Connection)]
+      temp.data.parasite[, Parasite.Number.Individuals.Between := .N, 
+                         by = list(Parasite.Time, Parasite.Replicate, 
+                                   Parasite.Infection.Genotype, Virulence, Popsize, 
+                                   Parasite.Connection, Host.Connection)]
+      temp.data.parasite[, Parasite.Population.Size.Between := .N, 
+                         by = list(Parasite.Time, Parasite.Replicate, Virulence, Popsize,
+                                   Parasite.Connection, Host.Connection)]
+      
+      #########
+      temp.data.host[, Total.Parasite.Number.Individuals := 
+                       Epidemic.Size.Within + 
+                       temp.data.parasite[
+                         Parasite.Replicate == Host.Replicate[1] & 
+                           Parasite.Population == Host.Population[1] & 
+                           Parasite.Time == Host.Time[1] & 
+                           Parasite.Infection.Genotype == Immune.Genotype[1], .N], 
+                     by = list(Host.Time, Host.Replicate, Host.Population, 
+                               Immune.Genotype, Virulence, Popsize, Parasite.Connection,
+                               Host.Connection)]
+      temp.data.host[, Total.Parasite.Population.Size := 
+                       Epidemic.Size.Total + 
+                       temp.data.parasite[
+                         Parasite.Replicate == Host.Replicate[1] & 
+                           Parasite.Population == Host.Population[1] & 
+                           Parasite.Time == Host.Time[1], .N], 
+                     by = list(Host.Time, Host.Replicate, Host.Population, Virulence, 
+                               Popsize, Parasite.Connection, Host.Connection)]
+
+      temp.data.host[, Total.Parasite.Number.Individuals.Between := 
+                       Epidemic.Size.Within + 
+                       temp.data.parasite[
+                         Parasite.Replicate == Host.Replicate[1] & 
+                           Parasite.Population == Host.Population[1] & 
+                           Parasite.Time == Host.Time[1] &  
+                           Parasite.Infection.Genotype == Immune.Genotype[1], .N], 
+                     by = list(Host.Time, Host.Replicate, Immune.Genotype, Virulence, 
+                               Popsize, Parasite.Connection, Host.Connection)]
+      temp.data.host[, Total.Parasite.Population.Size.Between := 
+                       Epidemic.Size.Total + 
+                       temp.data.parasite[
+                         Parasite.Replicate == Host.Replicate[1] & 
+                           Parasite.Population == Host.Population[1] & 
+                           Parasite.Time == Host.Time[1], .N], 
+                     by = list(Host.Time, Host.Replicate, Virulence, Popsize, 
+                               Parasite.Connection, Host.Connection)]
+      
+      #########
+      fwrite(
+        unique(temp.data.host[, 
+                              list(Host.Time, Host.Replicate, Host.Population, 
+                                   Immune.Genotype, Virulence, Popsize, Random.Drift,
+                                   Parasite.Connection, Host.Connection, 
+                                   Host.Number.Individuals, Host.Population.Size,
+                                   Host.Number.Individuals.Between, 
+                                   Host.Population.Size.Between, Epidemic.Size.Within,
+                                   Epidemic.Size.Total, Total.Parasite.Number.Individuals,
+                                   Total.Parasite.Population.Size,
+                                   Total.Parasite.Number.Individuals.Between,
+                                   Total.Parasite.Population.Size.Between, Origin)]), 
+        file = paste(
+          result.file.location, 
+          result.file.name, 
+          "_Host_", 
+          run.date, 
+          "_summarized_", 
+          ".csv", sep = ""), append = TRUE)
+
+      fwrite(
+        unique(temp.data.parasite[, 
+                                  list(Parasite.Time, Parasite.Replicate, 
+                                       Parasite.Population, Parasite.Infection.Genotype, 
+                                       Virulence, Popsize, Random.Drift, 
+                                       Parasite.Connection, Host.Connection,
+                                       Parasite.Number.Individuals, 
+                                       Parasite.Population.Size, 
+                                       Parasite.Number.Individuals.Between,
+                                       Parasite.Population.Size.Between)]),
+        file = paste(
+          result.file.location, 
+          result.file.name, 
+          "_Parasite_", 
+          run.date, 
+          "_summarized_", 
+          ".csv", sep = ""), append = TRUE)
+      
+    }
   }
 }
 ```
@@ -1477,7 +1620,9 @@ The Digital\_Coevolution simulation currently consits of three to four
 interdependent R scripts. In oder to be able to run the
 Digital\_Coevolution simulation yourself, you simply have to to download
 or copy the relevant scripts from the github repository to your
-computer.
+computer. The Digital\_Coevolution simulation is implemented in R, so
+you will need a R installation as well. You can download the newest R
+version for your system from [CRAN.](https://cran.r-project.org/)
 
 ## Digital\_Coevolution on your local machine
 
@@ -1491,7 +1636,7 @@ scripts named “Digital\_Coevolution\_Dynamics\_Functions.R”,
 onto your computer. Put them all in the same folder. You will only have
 to interact with the “Digital\_Coevolution\_User.R” file. You can open
 and have a look at all of them though, there should be some comments
-that explain what which part is doing. But beware, fiddling around in
+that explain which part is doing what. But beware, fiddling around in
 there can break stuff.  
 The Digital\_Coevolution simulation has been successfully run on
 windows, linux and macintosh.
@@ -1508,7 +1653,17 @@ A bit further down in the script you have to specify the file path where
 the simulation should save the results. It can be the same folder than
 the scripts. And even a bit further down you have to name the result
 file. Make it a rememberable and also meaningfull name, so that later
-you still know what was done in that simulation.
+you still know what was done in that simulation.  
+You will also find settings called “raw.results” and
+“summarized.results”. There you can adjust if you want the raw
+results, meaning if a copy of the state of each host and parasite agent
+that exists in the simulation at the time of the reporting should be
+saved, or if you want summarized results. The summarized results
+contains for example number of individuals per genotype, per population,
+per metapopulation and so on, for both host and parasite agents as well
+as the infection state. Calculating the summary takes slightly longer,
+so if you are really hard pressed for time the simulation is faster with
+“summarized.results” set to FALSE.
 
 ``` r
 ############################################
@@ -1548,6 +1703,12 @@ result.file.location <- "/home/example/path/to/results/"
 ## "Digital_Coevolution_Results_Sys.Date_", 
 ## your filename will be added at the end of that.
 result.file.name <- "YourResultNameHere"
+
+###########################################################
+# Here you can set if the results should be saved raw 
+# or summarized or both, logical value FALSE or TRUE
+raw.results <- FALSE
+summarized.results <- TRUE
 ```
 
 The remainder of the file allows you to set some of the parameters of
@@ -1556,7 +1717,7 @@ play around with the values. Don’t worry, here you should not be able to
 break the simulation. You can for example set how many host populations
 should be simulated. And how large they should be. Or how virulent the
 parasite should be. If you specify too large host populations and a too
-long duration.days at the same time, the simulation will take a very
+long “duration.days” at the same time, the simulation will take a very
 long time and produce a very large result data set. How long a run of
 the simulation actually takes is anyones guess, as that depends heavily
 on the abilities of your local machine. Best would be to start small and
@@ -1568,7 +1729,11 @@ into the data file in append mode. If the setting is left at 1, the
 default, then every time step will be saved. If you set another value,
 lets say 10, then only every 10 timesteps will be saved, thus decreasing
 the size of the final output file by 10, but also decreasing your
-resolution in time. As with many things, there is a trade-off.  
+resolution in time. The simulation will run slightly faster if the
+reporting window is larger. If the reporting window is set to the same
+value as the duration of the simulation in “duration.days”, then only
+the starting and the ending state of the simulation will be saved. As
+with many things, there is a trade-off.  
 If you want to compare different parameter settings, you will have to do
 that consecutively. Set them, name the result, run the simulation,
 repeat. If you want to run many different parameter settings (parameter
@@ -1668,7 +1833,7 @@ print("Congratulations, you have successfully run the Digital_Coevolution simula
 print(paste("Simulation ended", Sys.time()))
 ```
 
-### Results
+### Getting the results
 
 If you see the message: “Congratulations, you have successfully run the
 Digital\_Coevolution simulation. Now go and check out those amazing
@@ -1689,6 +1854,254 @@ simulation, after all parameter settings have been made, but before the
 first loop of the simulation has run. It serves as a backup storage of
 the parameter settings of your run, should you need them at a later
 stage.
+
+## Digital\_Coevolution on a high performance cluster
+
+### The cluster computing environment
+
+The Digital\_Coevolution simulation has been used extensively on a high
+performance cluster computer from ETH Zuerich, Euler. Cluster computers
+are powerfull aggregations of several (thousands) of computing nodes
+that are used for scientific calculations or other tasks that need lots
+of power. A single node is usually far more powerfull than an average
+home computer, harbouring multiple CPUs with mutliple cores and plenty
+of memory (RAM). Users will be able to get a subset of the cluster
+computer resources that fits their need. Usually, a user will submit a
+computing job that has specific requirements in terms of CPU cores and
+memory. Running several such jobs in parallel is what makes cluster
+computers so powerfull. As each job is independent, this is a great tool
+for parameterspace exploration, where you want to run the simulation
+with many different parameter settings.  
+How a cluster computer can be used is dependent on the implementation of
+the cluster. In my use case of Euler cluster of ETH, the cluster runs on
+Unix and its resources are managed by an IBM LSF. LSF stands for load
+sharing facility and its the tool that distributes the available
+resources among the jobs requested by the users. The cluster itself can
+be accessed via entry nodes like a normal unix server, but running jobs
+on compute nodes can only be done via the LSF system. Access to the
+entry node is done via ssh from within the network. Your access system
+might differ.
+
+### Getting the Digital\_Coevolution simulation to a cluster
+
+Make sure that the cluster has R available on it. If it has not, please
+contact the adminstrator of your cluster, they will be able to help
+you.  
+Getting the Digital\_Coevoution simulation on the cluster is the easy
+part. Assuming that the entry node works like a standard unix server,
+you simply need to upload all the necessary files to a folder that can
+be acessed by you. You will need three R scripts:
+“Digital\_Coevolution\_Dynamics\_Functions.R”,
+“Digital\_Coevolution\_Parameterspace.R” and
+“Digital\_Coevolution\_Run\_Unix.R”, as well as one bash script:
+“Digital\_Coevolution\_User\_Cluster.sh” and one .txt joblist file:
+“Digital\_Coevolution\_Joblist\_Example.txt”. In total you will need
+five files. Uploading to the cluster is done easiest when you already
+have downloaded those files from github to you local computer, and then
+transfer them to the cluster via scp. On windows you will need an extra
+programm to transfer files to a unix server, for example winscp. You
+will need to interact with several of the files before running the
+simulation, depending on your preferences it might be easier to modify
+them on your local machine before uploading (see next section).
+
+### Running the Digital\_Coevoltution simulation on a cluster
+
+Running the Digital\_Coevolution simulation on a cluster is slightly
+different from running the simulation on your local machine. You will
+have to interact with three files instead of one.  
+First you will need to interact with the
+“Digital\_Coevolution\_Run\_Unix.R” file. In there you will need to
+set the paths to the folder on the cluster to where you have uploaded
+the scripts of the Digital\_Coevolution simulation, the folder where you
+want the results, and a path to a fast scatch disk that can be used
+during the simulation.  
+You can also set if you want raw results, summarized results, or both.
+
+``` r
+#############################################################
+### Helper script for the Digital_Coevolution simulation ####
+#############################################################
+### High performance cluster computer version ####
+##################################################
+# Please type the full path to the folder that contains 
+# the .R files, including this one.
+source.file.location <- "/cluster/home/username/Digital_Coevolution/Scripts/"
+
+# Please type the full path to the folder where results 
+# should be saved.
+final.result.location <- "/cluster/scratch/username/"
+
+# Set the working directory for within loop saving to ultra fast scratch on cluster node
+result.file.location <- "/scratch/"
+
+# Here you can set if the results should be saved raw 
+# or summarized or both, logical value FALSE or TRUE
+raw.results <- FALSE
+summarized.results <-TRUE
+```
+
+Next you will have to interact with the .txt file, the
+“Digital\_Coevolution\_Joblist\_Example.txt”. That is the file where
+you can set the parameters with which most will want to interact. Every
+line in the “Digital\_Coevolution\_Joblist\_Example.txt” file is a
+sepparate, independent combination of parameters that will be run in an
+independent instance of the Digital\_Coevolution simulation.  
+The first line in the “Digital\_Coevolution\_Joblist\_Example.txt” file
+are the names of the parameters that can be set. All those parameters
+are mandatory as they have no default settings (sorry). The order of
+those names in itself is irelevant, but the order of the parameter names
+in the first line, and the parameter values in all other lines needs to
+be the same.  
+**IMPORTANT:** As the Digital\_Coevolution simulation can simulate
+arbitrary numbers of host populations of arbitrary size, those need to
+be set explicitly. This means that you will need to add one parameter
+for each host population that you want to simulate. The names of these
+population parameters need necessarily to start with “host.population.”.
+If you want to simulate five host populations, you will need to add five
+parameters with distinct names starting with “host.population.”. Don’t
+forget that you also need to set the parameter values of the respective
+host populations.  
+All following lines are the respecive parameter values that correspond
+to the parameter names. The parameter values need to be in the same
+order than the parameter names.  
+You can add several lines that contain parameter values to the
+joblist.txt file, each of which will result in a separate run of the
+Digital\_Coevolution simulation with a different setting of parameters.
+Running a parameter space exploration can therefore easily be done by
+writing several lines into the
+“Digital\_Coevolution\_Joblist\_Example.txt” file. If you have several
+lines in the joblist, you will be running a “job array”, basically a
+list of jobs that you push to the cluster as one, but that the cluster
+will work on in a defined chunk size. You will need to know the number
+of parameter value lines for that. So all lines in the joblist file
+minus the first line containing the parameter names.  
+Below you find an example of a joblist file containing two lines of
+parameter values.
+
+The last file you will have to interact with is the bash script
+“Digital\_Coevolution\_User\_Cluster.sh”. Bash script? Right, for this
+user script you need to use bash, as most clusters (or at least the one
+I ran the simulation on) is running on unix.  
+The first line in the bash script tell the interpreter that is is a bash
+script.  
+The second and third line are used to set the maximum number of threads
+that can be used by the data.table package in R (which is used
+extensively in the simulation). This is an sensitive setting as it can
+produce varying results in different cluster environments. It is needed
+because data.table is capable of using multiple cores (or threads)
+natively. Data.table will automatically detect the number of cores
+available and use them accordingly. The number of cores or threads that
+data.table will detect can vary between systems and environments. On
+cluster computers there might eventually be the danger that data.table
+will detect all available cores on a node and not only the ones assigned
+to a job, and try to highjack them. This would lead to conflict and
+possibly the process being killed. In order to avoid that, the number of
+threads that data.table can detect is set explicitly. This at least is
+how I understood it and how I made it work.  
+The next 7 lines that all beginn with a **\#BSUB** string are intended
+for the LSF scheduler. The LSF scheduler distributes the clusters
+resources to the jobs that are requesting resources. All cluster
+resources that are specified there are valid per job, so each line from
+the joblist will have those resources available. If you request to
+little resources and your job requires more, it will usually be killed
+and cannot run to completion. If you repeatedly request way more
+resources than your job needs, your administrator will get angry at you.
+Usually, jobs that request more resources spend more time in the waiting
+queue before they get started. It is best practive though to request as
+little resources as possible but as much as needed.  
+The dash and character (for example “-J”) defines the use of the
+respective line.  
+The line “-J” is the name of the job or job array. In the brackets you
+can specify the lines in the joblist that this job array should run
+over, usually all of the parameter value lines in the joblist. After the
+bracket you can specify the chunk size with which the cluster should
+work on the task array.  
+The line “-R” is the space allocation, for both memory and scratch disk.
+In my bash script it is split in two lines for readability. The line
+with “-R” that reads “rusage\[mem=1000\]” is the memory allocation PER
+CORE, so the available RAM per job (one line in the joblist file) in mb.
+A value of 1000 means 1 GB of RAM per core.  
+The line “-n” is the number of cores PER JOB. A value of two means that
+each job gets two cores.  
+The line “-W” is the wall clock, meaning the available time that each
+job is allowed to run. The format is dd:hh:mm.  
+The line “-R” is the space allocation, for both memory and scratch disk.
+In my bash script it is split in two lines for readability. The line
+with “-R” that reads “rusage\[scratch=1000\]” is the scratch disk
+allocation PER CORE, so the available discspace per job (one line in the
+joblist file) in mb. A value of 1000 means 1 GB of discspace per core.
+This is only the discspace on the ultra fast scratch disc directly on a
+computation node, and will not be available after the simulation ends.  
+The line “-o” is the path and name of the output log file.  
+The line “-e” is the path and name of the output error file.
+
+A bit further down are two lines starting with “newvars = …” and “varid
+= …”, there you need to specify the path on the cluster to the folder
+where the “Digital\_Coevolution\_Joblist\_Example.txt” is.  
+Then follows a line starting with “resultname=..”. There you specify the
+resultname.  
+The “module load” line loads the R module on the cluster, this line you
+will have to modify with the respecitve module on your cluster.  
+Finally there is the last line that starts with “Rscript”, which starts
+the R session and where you need to specify the folder on the cluster
+where the R scripts are locaded.
+
+Those are a lot of things that you need to specify, and especially
+setting the requested resources right is not straightforward. But is is
+also not as hard as it sounds. Being able to leverage the power of
+cluster computing does greatly increase the scope of projects that can
+be tackled with the Digital\_Coevolution simulation.
+
+``` bash
+#!/bin/bash 
+export OMP_NUM_THREADS=2
+export OMP_THREAD_LIMIT=2
+#BSUB -J "Example_Jobname[1-14]%7"
+#BSUB -R "rusage[mem=1000]" 
+#BSUB -n 2
+#BSUB -W 01:00
+#BSUB -R "rusage[scratch=1000]" 
+#BSUB -o /cluster/home/username/Digital_Coevolution/LogFiles/
+Example_Jobname_username.log.%J.%I
+#BSUB -e /cluster/home/username/Digital_Coevolution/ErrorFiles/
+Example_Jobname_username.err.%J.%I
+
+IDX=$LSB_JOBINDEX
+
+newvars=`tail -n+$((IDX+1)) "/cluster/home/username/Digital_Coevolution/Scripts/
+Digital_Coevolution_Joblist_Example.txt" | head -n1`
+varid=`tail -n+1 "/cluster/home/username/Digital_Coevolution/Scripts/
+Digital_Coevolution_Joblist_Example.txt" | head -n1`
+resultname="Example_Jobname"
+
+module load new gcc/4.8.2 r/3.6.0
+Rscript "/cluster/home/username/Digital_Coevolution/Scripts/
+Digital_Coevolution_Run_Unix.R" $varid $newvars $IDX $resultname
+```
+
+After having set all those things in the
+“Digital\_Coevolution\_Run\_Unix.R”, the
+“Digital\_Coevolution\_User\_Cluster.sh” and the
+“Digital\_Coevolution\_Joblist\_Example.txt” file, you will have to
+upload those files into the same folder on the cluster where the other
+three R scripts are. In order to start the job array on the cluster, you
+need to submit it. For this you will need to access the cluster, usually
+using ssh. On clusters using the IBM LSF, you will have to submit your
+job array to LSF in order to run it. It is depreciated to execute the
+bash script directly. Submitting the job array to LSF is done simply by
+navigating to the folder that contains the R and bash scripts and
+submitting the bash script “Digital\_Coevolution\_User\_Cluster.sh” to
+bsub.
+
+``` bash
+bsub < Digital_Coevolution_User_Cluster.sh
+```
+
+Thats finally it. Your job is submitted to the queue and will be run
+soon. After the job is done, you will find the results in the folder
+that you have specified as final.result.folder in the
+“Digital\_Coevolution\_Run\_Unix.R” script. The names and structure of
+the files is the same as described in the local use case above.
 
 -----
 
@@ -1717,7 +2130,7 @@ Last but not least: Have fun, explore, stay curious.
 Cheers  
 Robert
 
-<br> 
+<br>
 
 # References
 
