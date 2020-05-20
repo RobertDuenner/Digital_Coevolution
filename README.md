@@ -5,7 +5,7 @@
 **Licence:** GPL-3.0  
 **Language:** R
 
-## Introduction
+# Introduction
 
 The Digital\_Coevolution simulation is an agent-based time-forward
 simulation written in R. It implements detailed life histories of
