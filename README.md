@@ -18,7 +18,8 @@ via an infection table.
 The Digital\_Coevolution simulation can be used for research and
 teaching in negative frequency-dependent host-parasite coevolution.  
 A very detailed description of the Digital\_Coevolution simulation that
-was published as the first chapter of my PhD thesis can be found here.
+was published as the first chapter of my PhD thesis can be found
+[here.](https://github.com/RobertDuenner/Digital_Coevolution/blob/d3a18b601b2b6c9358734ba0d63ca16dd272141b/Writing/Digital_Coevolution.pdf)
 
 # Using the Digital\_Coevolution simulation
 
@@ -31,7 +32,7 @@ copy the relevant scripts from the GitHub repository to your computer.
 The Digital\_Coevolution simulation is implemented in R (Team 2020) and
 relies heavily on the data.table package (Dowle and Srinivasan 2019).
 You can download the newest R version for your system from
-[CRAN.](https://cran.r-project.org/).
+[CRAN.](https://cran.r-project.org/)
 
 This document is written in R markdown (Xie, Allaire, and Grolemund
 2018; Allaire et al. 2020) in R (Team 2020) using R Studio (Team 2019)
